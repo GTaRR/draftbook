@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ckeditor :editor="editor" :value="editorData" :config="editorConfig"></ckeditor>
+    <ckeditor :editor="editor" :value="editorData" :config="editorConfig" @input="changeData"></ckeditor>
   </div>
 </template>
 
@@ -20,7 +20,12 @@ export default {
           editorConfig: {
               language: 'ru'
           }
-      };
+      }
+  },
+  methods: {
+    changeData: function( event) {
+      this.$emit('change', event);
+    }
   }
 }
 </script>
