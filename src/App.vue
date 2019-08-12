@@ -2,12 +2,13 @@
   <div id="app">
     <b-card no-body>
       <b-tabs v-model="tabIndex" pills card vertical>
-        <b-tab v-for="(editor, key) in editors" :key="editor.id">
+        <b-tab v-for="(editor, key) in editors" :key="editor.id" title-link-class="d-flex justify-content-between">
           <template slot="title">
             {{ editor.name }}
             <b-button size="sm" variant="secondary" @click="closeTab(key)">x</b-button>
           </template>
           <b-card-text>
+            <b-form-input v-model="editor.name" class="mb-2" placeholder="Имя документа"></b-form-input>
             <Editor :editorData="editor.data" @change="changeData($event, key)"></Editor>
           </b-card-text>
         </b-tab>
@@ -38,8 +39,8 @@ export default {
       editors: [
         {
           id: 0,
-          name: 'Таб 0',
-          data: 'Текст 0'
+          name: 'Вкладка 0',
+          data: 'Текст документа'
         }
       ],
       tabIndex: 0,
@@ -68,8 +69,8 @@ export default {
     newTab() {
       this.editors.push({
         id: this.tabCounter,
-        name: 'Таб ' + this.tabCounter,
-        data: 'Текст ' + this.tabCounter
+        name: 'Вкладка ' + this.tabCounter,
+        data: 'Текст документа ' + this.tabCounter
       });
       this.tabCounter++;
     }
@@ -87,6 +88,9 @@ export default {
   height: 100%;
 }
 .ck-editor__editable_inline {
-    min-height: 90vh;
+    min-height: 85vh;
+}
+.card-header {
+  width: 256px;
 }
 </style>
