@@ -1,29 +1,7 @@
-# multi-cke-draft
+# Черновик для заметок!
 
-## Project setup
-```
-npm install
-```
+Это просто черновик для заметок, который автоматически запоминает данные в LocalStorage браузера и при закрытии страницы данные не теряются.
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+Удобно использовать для написания оценок, инструкций и прочего без создания документа, использования отдельного редактора.
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+Запоминаются все вкладки. При очистке кеша всего браузера стираются и эти заметки из LocalStorage.
