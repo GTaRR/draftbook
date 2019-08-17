@@ -16,7 +16,7 @@
           </template>
           <b-card-text>
             <b-form-input v-model="editor.name" class="mb-2" placeholder="Имя заметки"></b-form-input>
-            <Editor :editorData="editor.data" @change="changeData($event, key)"></Editor>
+            <ckeditor :editor="classicEditor" v-model="editor.data" :config="editorConfig"></ckeditor>
           </b-card-text>
         </b-tab>
 
@@ -44,15 +44,19 @@
 </template>
 
 <script>
-import Editor from './components/Editor.vue';
+// import Editor from './components/Editor.vue';
+import ClassicEditor from './ckeditor';
 
 export default {
   name: 'app',
-  components: {
-    Editor
-  },
+  // components: {
+  //   Editor
+  // },
   data(){
     return {
+      classicEditor: ClassicEditor,
+      // editorData: '',
+      editorConfig: {},
       editors: [
         {
           id: 0,
