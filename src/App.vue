@@ -22,6 +22,16 @@
 
         <template slot="tabs-end">
           <b-nav-item @click.prevent="newTab" class="text-center" href="#"><b><i class="fas fa-plus"></i></b></b-nav-item>
+          <div v-if="!collapse && 0" class="import-wrapper mt-auto d-flex">
+            <button class="btn btn-light" @click="getJSON">
+              <i class="fas fa-download"></i>
+              <span>Экспорт</span>
+            </button>
+            <button class="btn btn-light">
+              <i class="fas fa-upload"></i>
+              <span>Импорт</span>
+            </button>
+          </div>
         </template>
 
         <div slot="empty" class="text-center text-muted pt-5">
@@ -69,6 +79,13 @@ export default {
     }
   },
   methods: {
+    getJSON() {
+      let blob = new Blob([JSON.stringify(this.editors)], {type : 'application/json'});
+      let link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = 'draft.json';
+      link.click();
+    },
     toggleSidebar() {
       this.collapse = !this.collapse;
       this.$refs.tabsWrapper.$el.classList.toggle('collapse-tabs');

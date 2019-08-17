@@ -24,9 +24,6 @@
   z-index: 1
   position: relative
   overflow: hidden
-  .collapse-tabs &
-    width: 4.5rem
-    overflow: hidden
   @media (max-width: 768px)
     width: 100vw
     max-width: 100vw
@@ -40,13 +37,11 @@
   width: 256px
   .nav-item:not(:last-child) &
     border-bottom: 1px solid #eee
-  .collapse-tabs &
-    width: 4.5rem
-    padding: 1.125rem 1rem
   .tab-title
     text-overflow: ellipsis
     white-space: nowrap
     overflow: hidden
+    line-height: 1.95rem
   @media (max-width: 768px)
     width: 100%
   //font-weight: bold
@@ -74,9 +69,44 @@
   text-transform: uppercase
   color: #fff
   font-size: 1.25rem
-  .collapse-tabs &
-    opacity: 0
-    width: 0
 ::selection
   background-color: $primary
   color: #fff
+
+.import-wrapper
+  .btn
+    border-radius: 0
+    transition: all .6s ease-in-out
+    width: 50%
+    flex-direction: column
+    display: flex
+    align-items: center
+    justify-content: center
+    padding: 10px
+  .btn + .btn
+    border-left: 1px solid #eee
+
+.collapse-tabs
+  .nav-link
+    width: 72px
+    padding: 1.125rem 1rem
+  .logo-title
+    opacity: 0
+    width: 0
+  .card-header
+    width: 4.5rem
+    overflow: hidden
+  .import-wrapper
+    flex-direction: column
+    span
+      display: none
+    .btn
+      max-width: 4.5rem
+      width: 4.5rem
+      height: 4.5rem
+      border-bottom: 1px solid #eee
+    .btn + .btn
+      border-left: none
+
+.ck.ck-editor__main>.ck-editor__editable.ck-focused
+  border-color: $primary !important
