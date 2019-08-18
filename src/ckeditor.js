@@ -28,6 +28,10 @@ import RemoveFormat from '@ckeditor/ckeditor5-remove-format/src/removeformat';
 import AutoFormat from '@ckeditor/ckeditor5-autoformat/src/autoformat';
 // import ClipBoard from '@ckeditor/ckeditor5-clipboard/src/clipboard';
 
+// import HrPlugin from '@didask/ckeditor5-hr/src/hr';
+// import HrToolbar from '@didask/ckeditor5-hr/src/hrtoolbar';
+// import HrVisibility from '@didask/ckeditor5-hr/src/hrvisibility';
+
 import '@ckeditor/ckeditor5-build-classic/build/translations/ru';
 
 export default class ClassicEditor extends ClassicEditorBase {}
@@ -60,6 +64,10 @@ ClassicEditor.builtinPlugins = [
     // ClipBoard,
     AutoFormat,
     // PasteFromOffice,
+
+    // HrPlugin,
+    // HrToolbar,
+    // HrVisibility,
 ];
 
 ClassicEditor.defaultConfig = {
@@ -70,6 +78,8 @@ ClassicEditor.defaultConfig = {
         '|',
         'bold', 'italic', 'underline', 'strikethrough', 'code', /*'subscript', 'superscript',*/
         '|',
+        // 'hr',
+        // '|',
         'link', 'bulletedList', 'numberedList', 'blockQuote', "insertTable",
         // '|',
         // 'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor',
