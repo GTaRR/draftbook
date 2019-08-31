@@ -2,8 +2,8 @@ import Vue from 'vue';
 import App from './App.vue';
 import CKEditor from '@ckeditor/ckeditor5-vue';
 import BootstrapVue from 'bootstrap-vue';
-import moment from 'moment';
 
+import moment from 'moment';
 require('moment/locale/ru');
 
 import '@fortawesome/fontawesome-free/scss/fontawesome.scss';
