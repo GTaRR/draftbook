@@ -20,6 +20,7 @@
         <b-tab v-for="(editor, key) in editors"
                :key="editor.id"
                title-link-class="d-flex justify-content-between"
+               @click="clickTab(editor.id)"
         >
           <template slot="title">
             <span class="tab-title"
@@ -42,7 +43,26 @@
                       v-model="editor.data"
                       :config="editorConfig"
                       @input="changeData"
+                      @focus="onEditorFocus"
+                      @blur="onEditorBlur"
             ></ckeditor>
+            <div class="mt-3">
+              <span class="mr-2">
+                <span class="text-dark mr-2">Время с момента создания заметки:</span>
+                <span class="text-success mr-2">{{ editor.time.create | moment("from", "now") }}</span>
+<!--                <i class="fa far fa-clock text-success"></i>-->
+              </span>
+              <span class="mr-2">
+                <span class="text-dark mr-2">Заметка открыта:</span>
+                <span class="text-success mr-2">{{ -editor.time.open | duration('humanize', true) }}</span>
+<!--                <i class="fa far fa-clock text-success"></i>-->
+              </span>
+              <span class="mr-2">
+                <span class="text-dark mr-2">Поле в фокусе:</span>
+                <span class="text-success">{{ -editor.time.focus | duration('humanize', true) }}</span>
+<!--                <i class="fa far fa-clock text-success"></i>-->
+              </span>
+            </div>
           </b-card-text>
         </b-tab>
 
@@ -91,6 +111,7 @@
 
 <script>
 import ClassicEditor from './ckeditor';
+import moment from 'moment';
 
 export default {
   name: 'app',
@@ -115,14 +136,22 @@ export default {
                 <p><strong>Как переименовать вкладку?&nbsp;</strong></p>
                 <p>Заголовок заметки сверху является полем ввода.</p>
             </blockquote>
-          `
+          `,
+          time: {
+              create: moment(new Date()).format(),
+              open: 0,
+              focus: 0,
+          }
         }
       ],
       tabIndex: 0,
       tabCounter: 1,
+      activeEditor: 0,
       collapse: false,
       darkMode: false,
-      jsonFile: null
+      jsonFile: null,
+      interval: null,
+      inFocus: false,
     }
   },
   created: function(){
@@ -137,6 +166,20 @@ export default {
       }
       this.tabCounter++;
     }
+    this.editors.map(item => {
+        if(typeof item.time === 'undefined') {
+            item.time = {
+                create: moment(new Date()).format(),
+                open: 0,
+                focus: 0
+            }
+        }
+    });
+  },
+  mounted(){
+    this.interval = setInterval(() => {
+      this.tick();
+    }, 500);
   },
   methods: {
     focusTitle() {
@@ -179,10 +222,30 @@ export default {
       this.editors.push({
         id: this.tabCounter,
         name: 'Новая вкладка',
-        data: 'Текст заметки ' + this.tabCounter
+        data: 'Текст заметки ' + this.tabCounter,
+        time: {
+            create: moment(new Date()).format(),
+            open: 0,
+            focus: 0
+        }
       });
       this.tabCounter++;
       localStorage.setItem('multiple_cke_data', JSON.stringify(this.editors));
+    },
+    tick() {
+      this.editors[this.tabIndex].time.open += 500;
+      if(this.inFocus) {
+          this.editors[this.tabIndex].time.focus += 500;
+      }
+    },
+    clickTab(tabId) {
+      this.activeEditor = tabId;
+    },
+    onEditorFocus() {
+      this.inFocus = true;
+    },
+    onEditorBlur() {
+      this.inFocus = false;
     }
   }
 }
