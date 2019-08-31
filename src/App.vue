@@ -46,22 +46,20 @@
                       @focus="onEditorFocus"
                       @blur="onEditorBlur"
             ></ckeditor>
-            <div class="mt-3">
-              <span class="mr-2">
-                <span class="text-dark mr-2">Время с момента создания заметки:</span>
-                <span class="text-success mr-2">{{ editor.time.create | moment("from", "now") }}</span>
-<!--                <i class="fa far fa-clock text-success"></i>-->
+            <div class="mt-3 d-flex align-items-center">
+              <span class="mr-2" v-b-tooltip.hover :title="editor.time.create | moment('Do MMMM YYYY, H:mm:ss')">
+                <span class="text-dark mr-2">Заметка создана:</span>
+                <span class="text-success mr-2">{{ currentTabTimeDiff }}</span>
               </span>
               <span class="mr-2">
                 <span class="text-dark mr-2">Заметка открыта:</span>
-                <span class="text-success mr-2">{{ -editor.time.open | duration('humanize', true) }}</span>
-<!--                <i class="fa far fa-clock text-success"></i>-->
+                <span class="text-success mr-2">{{ currentTabTimeWhileOpen }}</span>
               </span>
               <span class="mr-2">
                 <span class="text-dark mr-2">Поле в фокусе:</span>
-                <span class="text-success">{{ -editor.time.focus | duration('humanize', true) }}</span>
-<!--                <i class="fa far fa-clock text-success"></i>-->
+                <span class="text-success">{{ currentTabTimeWhileFocus }}</span>
               </span>
+              <b-button class="ml-auto py-0" v-b-modal.modal-checklist variant="link"><i class="fas fa-clipboard-list mr-2"></i>Чеклист</b-button>
             </div>
           </b-card-text>
         </b-tab>
@@ -106,12 +104,23 @@
         </div>
       </b-tabs>
     </b-card>
+    <b-modal id="modal-checklist" title="Чеклист для оценок" hide-footer>
+      <div class="mt-2">
+        <ul class="list-group mb-3">
+          <li class="list-group-item">Нужно ли создавать резервную копию?</li>
+          <li class="list-group-item">Нужно ли переносить изменения на боевой?</li>
+          <li class="list-group-item">Нужно ли создавать копию сайта на тестовом сервере?</li>
+          <li class="list-group-item">Учтён ли адаптив в вёрстке?</li>
+          <li class="list-group-item">Макет для верстки в адекватном формате?</li>
+        </ul>
+        <p class="text-center mb-1">Есть ещё варианты? Пишите: <a href="mailto:vs@site-master.su">vs@site-master.su</a></p>
+      </div>
+    </b-modal>
   </div>
 </template>
 
 <script>
 import ClassicEditor from './ckeditor';
-import moment from 'moment';
 
 export default {
   name: 'app',
@@ -138,7 +147,7 @@ export default {
             </blockquote>
           `,
           time: {
-              create: moment(new Date()).format(),
+              create: this.$moment(),
               open: 0,
               focus: 0,
           }
@@ -152,6 +161,9 @@ export default {
       jsonFile: null,
       interval: null,
       inFocus: false,
+      currentTabTimeDiff: '',
+      currentTabTimeWhileOpen: '',
+      currentTabTimeWhileFocus: '',
     }
   },
   created: function(){
@@ -169,7 +181,7 @@ export default {
     this.editors.map(item => {
         if(typeof item.time === 'undefined') {
             item.time = {
-                create: moment(new Date()).format(),
+                create: this.$moment(),
                 open: 0,
                 focus: 0
             }
@@ -221,10 +233,10 @@ export default {
     newTab() {
       this.editors.push({
         id: this.tabCounter,
-        name: 'Новая вкладка',
+        name: 'Новая заметка',
         data: 'Текст заметки ' + this.tabCounter,
         time: {
-            create: moment(new Date()).format(),
+            create: this.$moment(),
             open: 0,
             focus: 0
         }
@@ -237,6 +249,10 @@ export default {
       if(this.inFocus) {
           this.editors[this.tabIndex].time.focus += 500;
       }
+      this.setCurrentTabTimeWhileFocus();
+      this.setCurrentTabTimeWhileOpen();
+      this.setCurrentTabTimeFromCreate();
+      this.changeData();
     },
     clickTab(tabId) {
       this.activeEditor = tabId;
@@ -246,7 +262,32 @@ export default {
     },
     onEditorBlur() {
       this.inFocus = false;
-    }
+    },
+    setCurrentTabTimeFromCreate() {
+      let diffTime = this.$moment().diff(this.editors[this.tabIndex].time.create);
+      let duration = this.$moment.duration(diffTime);
+      let hrs = '0' + duration.hours(),
+          mins = '0' + duration.minutes(),
+          secs = '0' + duration.seconds();
+      let timeString = hrs.slice(-2) + ':' + mins.slice(-2) + ':' + secs.slice(-2) + ' назад';
+      this.currentTabTimeDiff = timeString;
+    },
+    setCurrentTabTimeWhileOpen() {
+      let duration = this.$moment.duration(this.editors[this.tabIndex].time.open);
+      let hrs = '0' + duration.hours(),
+          mins = '0' + duration.minutes(),
+          secs = '0' + duration.seconds();
+      let timeString = hrs.slice(-2) + ':' + mins.slice(-2) + ':' + secs.slice(-2);
+      this.currentTabTimeWhileOpen = timeString;
+    },
+    setCurrentTabTimeWhileFocus() {
+      let duration = this.$moment.duration(this.editors[this.tabIndex].time.focus);
+      let hrs = '0' + duration.hours(),
+          mins = '0' + duration.minutes(),
+          secs = '0' + duration.seconds();
+      let timeString = hrs.slice(-2) + ':' + mins.slice(-2) + ':' + secs.slice(-2);
+      this.currentTabTimeWhileFocus = timeString;
+    },
   }
 }
 </script>
