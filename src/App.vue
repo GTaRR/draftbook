@@ -7,7 +7,10 @@
               vertical
               lazy
               ref="tabsWrapper"
+              :nav-class="{'fixed-nav':fixedSidebar}"
+              nav-wrapper-class="nav-wrapper"
       >
+
         <template slot="tabs-start">
           <div class="main-header py-3 px-3 d-flex align-items-center">
             <button class="mr-3 btn btn-primary"
@@ -25,6 +28,7 @@
           <template slot="title">
             <span class="tab-title"
                   @dblclick="focusTitle"
+                  v-b-tooltip="editor.name"
             >{{ editor.name }}</span>
             <span v-if="!collapse"
                   class="btn btn-sm"
@@ -98,12 +102,23 @@
               <span>Тема</span>
             </button>
           </div>
+          <div class="mt-auto d-flex justify-content-center">
+            <b-form-checkbox v-model="fixedSidebar"
+                             name="check-button"
+                             button
+                             button-variant="primary"
+                             v-b-tooltip="'Фиксировать сайдбар'"
+            >
+              <i class="fas fa-thumbtack"></i>
+            </b-form-checkbox>
+          </div>
         </template>
 
         <div slot="empty" class="text-center text-muted pt-5">
           Не создано ни одной заметки<br>
           создайте новую при помощи кнопки <b>+</b>
         </div>
+
       </b-tabs>
     </b-card>
     <b-modal id="modal-checklist" title="Чек-лист для оценок" hide-footer>
@@ -166,6 +181,7 @@ export default {
       currentTabTimeDiff: '',
       currentTabTimeWhileOpen: '',
       currentTabTimeWhileFocus: '',
+      fixedSidebar: true
     }
   },
   created: function(){
@@ -220,7 +236,9 @@ export default {
       this.$refs.tabsWrapper.$el.classList.toggle('collapse-tabs');
     },
     changeData() {
-      localStorage.setItem('multiple_cke_data', JSON.stringify(this.editors));
+      if (!document.hidden) {
+        localStorage.setItem('multiple_cke_data', JSON.stringify(this.editors));
+      }
     },
     closeTab(x) {
       for (let editor in this.editors) {
