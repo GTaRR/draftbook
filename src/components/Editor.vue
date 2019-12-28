@@ -1,6 +1,10 @@
 <template>
   <div>
-    <ckeditor :editor="editor" :value="editorData" :config="editorConfig" @input="changeData"></ckeditor>
+    <ckeditor :editor="editor"
+              :value="editorData"
+              :config="editorConfig"
+              @input="changeData"
+    ></ckeditor>
   </div>
 </template>
 

@@ -25,6 +25,7 @@
                title-link-class="d-flex justify-content-between"
                @click="clickTab(editor.id)"
         >
+
           <template slot="title">
             <span class="tab-title"
                   @dblclick="focusTitle"
@@ -36,7 +37,9 @@
                   @click="closeTab(key)"
             ><i class="fas fa-times"></i></span>
           </template>
+
           <b-card-text>
+
             <b-form-input ref="titleInput"
                           v-model="editor.name"
                           class="mb-2"
@@ -53,7 +56,12 @@
             <div class="mt-3 d-flex align-items-center flex-wrap">
               <span class="mr-2">
                 <span class="text-dark mr-2">Заметка создана:</span>
-                <span class="text-success mr-2" v-b-tooltip.hover :title="editor.time.create | moment('Do MMMM YYYY, H:mm:ss')">{{ currentTabTimeDiff }}</span>
+                <span class="text-success mr-2"
+                      v-b-tooltip.hover
+                      :title="editor.time.create | moment('Do MMMM YYYY, H:mm:ss')"
+                >
+                  {{ currentTabTimeDiff }}
+                </span>
               </span>
               <span class="mr-2">
                 <span class="text-dark mr-2">Заметка открыта:</span>
@@ -63,20 +71,29 @@
                 <span class="text-dark mr-2">Поле в фокусе:</span>
                 <span class="text-success">{{ currentTabTimeWhileFocus }}</span>
               </span>
-              <a href="javascript:void(0);" class="ml-auto py-0" v-b-tooltip.hover.left="'Чек-лист для оценок'" v-b-modal.modal-checklist variant="link">
+              <a href="javascript:void(0);"
+                 class="ml-auto py-0"
+                 v-b-tooltip.hover.left="'Чек-лист для оценок'"
+                 v-b-modal.modal-checklist
+                 variant="link"
+              >
                 Чек-лист
               </a>
             </div>
+
           </b-card-text>
+
         </b-tab>
 
         <template slot="tabs-end">
+
           <b-nav-item @click.prevent="newTab"
                       class="text-center"
                       href="#"
           >
             <i class="fas fa-plus"></i>
           </b-nav-item>
+
           <div v-if="!collapse && 0"
                class="import-wrapper mt-auto d-flex"
           >
@@ -102,6 +119,7 @@
               <span>Тема</span>
             </button>
           </div>
+
           <div class="mt-auto d-flex justify-content-center">
             <b-form-checkbox v-model="fixedSidebar"
                              name="check-button"
@@ -112,6 +130,7 @@
               <i class="fas fa-thumbtack"></i>
             </b-form-checkbox>
           </div>
+
         </template>
 
         <div slot="empty" class="text-center text-muted pt-5">
@@ -121,6 +140,7 @@
 
       </b-tabs>
     </b-card>
+
     <b-modal id="modal-checklist" title="Чек-лист для оценок" hide-footer>
       <div class="mt-2">
         <ul class="list-group mb-3">
@@ -133,6 +153,7 @@
         <p class="text-center mb-1">Есть ещё варианты? Пишите: <a href="mailto:vs@site-master.su">vs@site-master.su</a></p>
       </div>
     </b-modal>
+
   </div>
 </template>
 
