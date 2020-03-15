@@ -46,6 +46,7 @@
                           placeholder="Имя заметки"
                           @input="changeData"
             ></b-form-input>
+
             <ckeditor :editor="classicEditor"
                       v-model="editor.data"
                       :config="editorConfig"
@@ -53,6 +54,7 @@
                       @focus="onEditorFocus"
                       @blur="onEditorBlur"
             ></ckeditor>
+
             <div class="mt-3 d-flex align-items-center flex-wrap">
               <span class="mr-2">
                 <span class="text-dark mr-2">Заметка создана:</span>
@@ -81,39 +83,64 @@
               </a>
             </div>
 
+            <b-modal id="sourceViewer" size="xl" centered title="Исходный код" >
+              <prism-editor
+                  :code="currentSourceCodeEditorDataBeautify"
+                  language="html"
+                  @change="changeSourceData"
+              />
+
+              <template v-slot:modal-footer="{ ok, hide }">
+                <b-button variant="success" @click="ok()">
+                  Сохранить
+                </b-button>
+                <b-button variant="dark" @click="copySource">
+                  Скопировать
+                </b-button>
+                <b-button variant="danger" @click="hide('forget')">
+                  Закыть
+                </b-button>
+              </template>
+            </b-modal>
+
           </b-card-text>
 
         </b-tab>
 
         <template slot="tabs-end">
 
-          <b-nav-item @click.prevent="newTab"
-                      class="text-center"
-                      href="#"
+          <b-nav-item
+            @click.prevent="newTab"
+            class="text-center"
+            href="#"
           >
             <i class="fas fa-plus"></i>
           </b-nav-item>
 
-          <div v-if="!collapse && 0"
-               class="import-wrapper mt-auto d-flex"
+          <div
+            v-if="!collapse && 0"
+            class="import-wrapper mt-auto d-flex"
           >
-            <button class="btn btn-light"
-                    @click="downloadJSON"
+            <button
+              class="btn btn-light"
+              @click="downloadJSON"
             >
               <i class="fas fa-download"></i>
               <span>Экспорт</span>
             </button>
-            <b-form-file accept="application/json"
-                         class="btn btn-light"
-                         placeholder=""
-                         drop-placeholder=""
-                         v-model="jsonFile"
+            <b-form-file
+              accept="application/json"
+              class="btn btn-light"
+              placeholder=""
+              drop-placeholder=""
+              v-model="jsonFile"
             >
               <i class="fas fa-upload"></i>
               <span>Импорт</span>
             </b-form-file>
-            <button class="btn btn-light"
-                    @click="darkMode = !darkMode"
+            <button
+              class="btn btn-light"
+              @click="darkMode = !darkMode"
             >
               <i class="fa fas fa-paint-brush"></i>
               <span>Тема</span>
@@ -121,11 +148,12 @@
           </div>
 
           <div class="mt-auto d-flex justify-content-center">
-            <b-form-checkbox v-model="fixedSidebar"
-                             name="check-button"
-                             button
-                             button-variant="primary"
-                             v-b-tooltip="'Фиксировать сайдбар'"
+            <b-form-checkbox
+              v-model="fixedSidebar"
+              name="check-button"
+              button
+              button-variant="primary"
+              v-b-tooltip="'Фиксировать сайдбар'"
             >
               <i class="fas fa-thumbtack"></i>
             </b-form-checkbox>
@@ -159,6 +187,10 @@
 
 <script>
 import ClassicEditor from './ckeditor';
+import "prismjs";
+import "prismjs/themes/prism.css";
+import PrismEditor from 'vue-prism-editor';
+import Beautify from 'js-beautify'
 
 export default {
   name: 'app',
@@ -202,8 +234,13 @@ export default {
       currentTabTimeDiff: '',
       currentTabTimeWhileOpen: '',
       currentTabTimeWhileFocus: '',
-      fixedSidebar: true
+      fixedSidebar: true,
+      currentSourceCodeEditorDataBeautify: '',
+      currentSourceCodeEditorData: '',
     }
+  },
+  components: {
+    PrismEditor
   },
   created: function(){
     this.tabCounter = Object.keys(this.editors).length;
@@ -231,8 +268,28 @@ export default {
     this.interval = setInterval(() => {
       this.tick();
     }, 1000);
+
+    document.addEventListener('showSourceModal', (evt) => {
+        this.currentSourceCodeEditorDataBeautify = Beautify.html(
+            this.editors[this.activeEditor].data
+        );
+        this.$bvModal.show('sourceViewer');
+        this.currentSourceCodeEditorData = '';
+    });
+
+    this.$root.$on('bv::modal::hide', (bvEvent, modalId) => {
+      if (modalId === 'sourceViewer' && bvEvent.trigger === 'ok' && this.currentSourceCodeEditorData) {
+        this.editors[this.activeEditor].data = this.currentSourceCodeEditorData;
+      }
+    })
   },
   methods: {
+    copySource() {
+      this.$clipboard(this.currentSourceCodeEditorDataBeautify);
+    },
+    changeSourceData(data) {
+      this.currentSourceCodeEditorData = data;
+    },
     focusTitle() {
       let classList = this.$refs.titleInput[0].$el.classList;
 

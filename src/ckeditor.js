@@ -32,6 +32,8 @@ import AutoFormat from '@ckeditor/ckeditor5-autoformat/src/autoformat';
 // import HrToolbar from '@didask/ckeditor5-hr/src/hrtoolbar';
 // import HrVisibility from '@didask/ckeditor5-hr/src/hrvisibility';
 
+import SourceView from './plugins/sourceview';
+
 import '@ckeditor/ckeditor5-build-classic/build/translations/ru';
 
 export default class ClassicEditor extends ClassicEditorBase {}
@@ -68,6 +70,8 @@ ClassicEditor.builtinPlugins = [
     // HrPlugin,
     // HrToolbar,
     // HrVisibility,
+
+    SourceView
 ];
 
 ClassicEditor.defaultConfig = {
@@ -87,6 +91,8 @@ ClassicEditor.defaultConfig = {
         'removeFormat',
         '|',
         'undo', 'redo',
+        '|',
+        'sourceView'
     ],
     table: {
         contentToolbar: [ 'tableColumn', 'tableRow', 'mergeTableCells' ]
