@@ -279,21 +279,37 @@ export default {
     }, 1000);
 
     document.addEventListener('showSourceModal', () => {
-        this.currentSourceCodeEditorDataBeautify = Beautify.html(
-            this.editors[this.activeEditor].data
-        );
-        this.$bvModal.show('sourceViewer');
-        this.currentSourceCodeEditorData = '';
+      this.currentSourceCodeEditorDataBeautify = Beautify.html(
+        this.editors[this.tabIndex].data
+      );
+      this.$bvModal.show('sourceViewer');
+      this.currentSourceCodeEditorData = '';
     });
 
     this.$root.$on('bv::modal::hide', (bvEvent, modalId) => {
-      if (modalId === 'sourceViewer' && bvEvent.trigger === 'ok' && this.currentSourceCodeEditorData) {
-        this.editors[this.activeEditor].data = this.currentSourceCodeEditorData;
+      if (this.isModalOk(bvEvent, modalId)) {
+        this.editors[this.tabIndex].data = this.currentSourceCodeEditorData;
       }
     })
   },
   methods: {
+    isModalOk(bvEvent, modalId) {
+      return modalId === 'sourceViewer'
+        && bvEvent.trigger === 'ok'
+        && this.currentSourceCodeEditorData;
+    },
     copySource() {
+      if (navigator.clipboard === undefined) {
+        this.$bvToast.toast(`Невозможно скопировать в буфер обмена из отсутствия HTTPS`, {
+            title: 'Ошибка',
+            autoHideDelay: 2000,
+            appendToast: true,
+            variant: 'danger',
+            toaster: 'b-toaster-top-center'
+        });
+
+        return;
+      }
       navigator.clipboard.writeText(
         (this.currentSourceCodeEditorData)
           ? this.currentSourceCodeEditorData
@@ -301,15 +317,22 @@ export default {
       )
         .then(() => {
           this.$bvToast.toast(`Исходный код скопирован`, {
-              title: 'Уведомление',
-              autoHideDelay: 2000,
-              appendToast: true,
-              variant: 'success',
-              toaster: 'b-toaster-top-center'
+            title: 'Уведомление',
+            autoHideDelay: 2000,
+            appendToast: true,
+            variant: 'success',
+            toaster: 'b-toaster-top-center'
           })
         })
         .catch(err => {
-          console.log('Something went wrong', err);
+          this.$bvToast.toast(`Произошла ошибка при копировании в буфер`, {
+              title: 'Ошибка',
+              autoHideDelay: 2000,
+              appendToast: true,
+              variant: 'danger',
+              toaster: 'b-toaster-top-center'
+          });
+          console.error('Произошла ошибка при копировании в буфер', err);
         });
     },
     changeSourceData(data) {

@@ -11,7 +11,7 @@ import Bold from '@ckeditor/ckeditor5-basic-styles/src/bold';
 import Italic from '@ckeditor/ckeditor5-basic-styles/src/italic';
 import Underline from '@ckeditor/ckeditor5-basic-styles/src/underline';
 import Strikethrough from '@ckeditor/ckeditor5-basic-styles/src/strikethrough';
-// import Code from '@ckeditor/ckeditor5-basic-styles/src/code';
+import Code from '@ckeditor/ckeditor5-basic-styles/src/code';
 
 import Link from '@ckeditor/ckeditor5-link/src/link';
 import List from '@ckeditor/ckeditor5-list/src/list';
@@ -50,7 +50,7 @@ ClassicEditor.builtinPlugins = [
     Italic,
     Underline,
     Strikethrough,
-    // Code,
+    Code,
     // Subscript,
     // Superscript,
 
@@ -80,7 +80,7 @@ ClassicEditor.defaultConfig = {
         '|',
         'alignment',
         '|',
-        'bold', 'italic', 'underline', 'strikethrough', /*'code',*/ /*'subscript', 'superscript',*/
+        'bold', 'italic', 'underline', 'strikethrough', 'code', /*'subscript', 'superscript',*/
         '|',
         // 'hr',
         // '|',
