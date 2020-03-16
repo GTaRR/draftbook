@@ -84,17 +84,17 @@
             </div>
 
             <b-modal id="sourceViewer" size="xl" centered title="Исходный код" >
-              <prism-editor
-                  :code="currentSourceCodeEditorDataBeautify"
-                  language="html"
-                  @change="changeSourceData"
-              />
-<!--              <MonacoEditor-->
-<!--                  class="editor"-->
-<!--                  :value="currentSourceCodeEditorDataBeautify"-->
-<!--                  @editorDidMount="editorDidMount"-->
+<!--              <prism-editor-->
+<!--                  :code="currentSourceCodeEditorDataBeautify"-->
 <!--                  language="html"-->
+<!--                  @change="changeSourceData"-->
 <!--              />-->
+              <codemirror
+                  ref="cmEditor"
+                  :value="currentSourceCodeEditorDataBeautify"
+                  :options="cmOptions"
+                  @input="onCmCodeChange"
+              />
 
               <template v-slot:modal-footer="{ ok }">
                 <b-button variant="success" @click="ok()">
@@ -150,13 +150,14 @@
             </button>
           </div>
 
-          <div class="mt-auto d-flex justify-content-center">
+          <div class="mt-auto d-flex justify-content-center fixed-checkbox-container">
             <b-form-checkbox
               v-model="fixedSidebar"
               name="check-button"
               button
               button-variant="primary"
-              v-b-tooltip="'Фиксировать сайдбар'"
+              v-b-tooltip="'Фиксирование сайдбара'"
+              class="w-100"
             >
               <i class="fas fa-thumbtack"></i>
             </b-form-checkbox>
@@ -190,13 +191,6 @@
 
 <script>
 import ClassicEditor from './ckeditor';
-
-// import MonacoEditor from 'vue-monaco';
-
-import "prismjs";
-// import Prism from "prismjs";
-import "prismjs/themes/prism.css";
-import PrismEditor from 'vue-prism-editor';
 
 import Beautify from 'js-beautify'
 
@@ -245,11 +239,18 @@ export default {
       fixedSidebar: true,
       currentSourceCodeEditorDataBeautify: '',
       currentSourceCodeEditorData: '',
+      cmOptions: {
+          tabSize: 2,
+          mode: 'xml',
+          htmlMode: true,
+          matchClosing: true,
+          theme: '3024-day',
+          lineNumbers: true,
+          line: true,
+          lineWrapping: false,
+          autofocus: true,
+      },
     }
-  },
-  components: {
-    PrismEditor,
-    // MonacoEditor,
   },
   created: function(){
     this.tabCounter = Object.keys(this.editors).length;
@@ -293,6 +294,10 @@ export default {
     })
   },
   methods: {
+    // onCmReady(cm) {
+    //   console.log(cm.getTextArea());
+    //   cm.getTextArea().focus();
+    // },
     isModalOk(bvEvent, modalId) {
       return modalId === 'sourceViewer'
         && bvEvent.trigger === 'ok'
@@ -335,21 +340,8 @@ export default {
           console.error('Произошла ошибка при копировании в буфер', err);
         });
     },
-    changeSourceData(data) {
+    onCmCodeChange(data) {
       this.currentSourceCodeEditorData = data;
-      // Prism.highlightAll();
-    },
-    focusTitle() {
-      let classList = this.$refs.titleInput[0].$el.classList;
-
-      this.$refs.titleInput[0].focus();
-      classList.add('animated');
-      classList.add('shake');
-
-      setTimeout(() => {
-        classList.remove('animated');
-        classList.remove('shake');
-      }, 1000);
     },
     downloadJSON() {
       let blob = new Blob([JSON.stringify(this.editors)], {type : 'application/json'});
@@ -358,14 +350,27 @@ export default {
       link.download = 'draft.json';
       link.click();
     },
-    toggleSidebar() {
-      this.collapse = !this.collapse;
-      this.$refs.tabsWrapper.$el.classList.toggle('collapse-tabs');
-    },
     changeData() {
       if (!document.hidden) {
         localStorage.setItem('multiple_cke_data', JSON.stringify(this.editors));
       }
+    },
+
+    focusTitle() {
+        let classList = this.$refs.titleInput[0].$el.classList;
+
+        this.$refs.titleInput[0].focus();
+        classList.add('animated');
+        classList.add('shake');
+
+        setTimeout(() => {
+            classList.remove('animated');
+            classList.remove('shake');
+        }, 1000);
+    },
+    toggleSidebar() {
+        this.collapse = !this.collapse;
+        this.$refs.tabsWrapper.$el.classList.toggle('collapse-tabs');
     },
     closeTab(x) {
       for (let editor in this.editors) {
@@ -391,6 +396,10 @@ export default {
       this.tabCounter++;
       localStorage.setItem('multiple_cke_data', JSON.stringify(this.editors));
     },
+    clickTab(tabId) {
+        this.activeEditor = tabId;
+    },
+
     tick() {
       this.editors[this.tabIndex].time.open += 1000;
       if(this.inFocus) {
@@ -401,15 +410,14 @@ export default {
       this.setCurrentTabTimeFromCreate();
       this.changeData();
     },
-    clickTab(tabId) {
-      this.activeEditor = tabId;
-    },
+
     onEditorFocus() {
       this.inFocus = true;
     },
     onEditorBlur() {
       this.inFocus = false;
     },
+
     setCurrentTabTimeFromCreate() {
       let diffTime = this.$moment().diff(this.editors[this.tabIndex].time.create);
       let duration = this.$moment.duration(diffTime);

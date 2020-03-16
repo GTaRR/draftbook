@@ -23,14 +23,10 @@ import BlockQuote from '@ckeditor/ckeditor5-block-quote/src/blockquote';
 import Table from '@ckeditor/ckeditor5-table/src/table';
 import TableToolbar from '@ckeditor/ckeditor5-table/src/tabletoolbar';
 
-// import PasteFromOffice from '@ckeditor/ckeditor5-paste-from-office/src/pastefromoffice';
+import PasteFromOffice from '@ckeditor/ckeditor5-paste-from-office/src/pastefromoffice';
 import RemoveFormat from '@ckeditor/ckeditor5-remove-format/src/removeformat';
 import AutoFormat from '@ckeditor/ckeditor5-autoformat/src/autoformat';
 // import ClipBoard from '@ckeditor/ckeditor5-clipboard/src/clipboard';
-
-// import HrPlugin from '@didask/ckeditor5-hr/src/hr';
-// import HrToolbar from '@didask/ckeditor5-hr/src/hrtoolbar';
-// import HrVisibility from '@didask/ckeditor5-hr/src/hrvisibility';
 
 import SourceView from './plugins/sourceview';
 
@@ -65,11 +61,7 @@ ClassicEditor.builtinPlugins = [
 
     // ClipBoard,
     AutoFormat,
-    // PasteFromOffice,
-
-    // HrPlugin,
-    // HrToolbar,
-    // HrVisibility,
+    PasteFromOffice,
 
     SourceView
 ];
@@ -82,8 +74,6 @@ ClassicEditor.defaultConfig = {
         '|',
         'bold', 'italic', 'underline', 'strikethrough', 'code', /*'subscript', 'superscript',*/
         '|',
-        // 'hr',
-        // '|',
         'link', 'bulletedList', 'numberedList', 'blockQuote', "insertTable",
         // '|',
         // 'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor',

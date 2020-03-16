@@ -1,7 +1,6 @@
 const path = require( 'path' );
 const CKEditorWebpackPlugin = require( '@ckeditor/ckeditor5-dev-webpack-plugin' );
 const { styles } = require( '@ckeditor/ckeditor5-dev-utils' );
-// const MonacoEditorPlugin = require('monaco-editor-webpack-plugin');
 
 module.exports = {
     // The source of CKEditor is encapsulated in ES6 modules. By default, the code
@@ -17,15 +16,7 @@ module.exports = {
             new CKEditorWebpackPlugin( {
                 // See https://ckeditor.com/docs/ckeditor5/latest/features/ui-language.html
                 language: 'ru'
-            } ),
-            // new MonacoEditorPlugin({
-            //     // https://github.com/Microsoft/monaco-editor-webpack-plugin#options
-            //     // Include a subset of languages support
-            //     // Some language extensions like typescript are so huge that may impact build performance
-            //     // e.g. Build full languages support with webpack 4.0 takes over 80 seconds
-            //     // Languages are loaded on demand at runtime
-            //     languages: ['html']
-            // })
+            } )
         ]
     },
 

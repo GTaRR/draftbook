@@ -3,6 +3,11 @@ import App from './App.vue';
 import CKEditor from '@ckeditor/ckeditor5-vue';
 import BootstrapVue from 'bootstrap-vue';
 
+import VueCodemirror from 'vue-codemirror'
+import 'codemirror/lib/codemirror.css'
+import 'codemirror/theme/3024-day.css'
+import 'codemirror/mode/xml/xml.js'
+
 import moment from 'moment';
 require('moment/locale/ru');
 
@@ -17,6 +22,7 @@ Vue.use( BootstrapVue );
 Vue.use(require('vue-moment'), {
   moment
 });
+Vue.use( VueCodemirror );
 
 new Vue({
   render: h => h(App)
