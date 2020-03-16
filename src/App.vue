@@ -89,16 +89,19 @@
                   language="html"
                   @change="changeSourceData"
               />
+<!--              <MonacoEditor-->
+<!--                  class="editor"-->
+<!--                  :value="currentSourceCodeEditorDataBeautify"-->
+<!--                  @editorDidMount="editorDidMount"-->
+<!--                  language="html"-->
+<!--              />-->
 
-              <template v-slot:modal-footer="{ ok, hide }">
+              <template v-slot:modal-footer="{ ok }">
                 <b-button variant="success" @click="ok()">
-                  Сохранить
+                  <i class="fas fa-save mr-2"></i>Сохранить
                 </b-button>
-                <b-button variant="dark" @click="copySource">
-                  Скопировать
-                </b-button>
-                <b-button variant="danger" @click="hide('forget')">
-                  Закыть
+                <b-button variant="dark" @click="copySource" ref="copyInBufferBtn">
+                  <i class="fas fa-clipboard mr-2"></i>Скопировать
                 </b-button>
               </template>
             </b-modal>
@@ -187,9 +190,14 @@
 
 <script>
 import ClassicEditor from './ckeditor';
+
+// import MonacoEditor from 'vue-monaco';
+
 import "prismjs";
+// import Prism from "prismjs";
 import "prismjs/themes/prism.css";
 import PrismEditor from 'vue-prism-editor';
+
 import Beautify from 'js-beautify'
 
 export default {
@@ -240,7 +248,8 @@ export default {
     }
   },
   components: {
-    PrismEditor
+    PrismEditor,
+    // MonacoEditor,
   },
   created: function(){
     this.tabCounter = Object.keys(this.editors).length;
@@ -269,7 +278,7 @@ export default {
       this.tick();
     }, 1000);
 
-    document.addEventListener('showSourceModal', (evt) => {
+    document.addEventListener('showSourceModal', () => {
         this.currentSourceCodeEditorDataBeautify = Beautify.html(
             this.editors[this.activeEditor].data
         );
@@ -285,10 +294,27 @@ export default {
   },
   methods: {
     copySource() {
-      this.$clipboard(this.currentSourceCodeEditorDataBeautify);
+      navigator.clipboard.writeText(
+        (this.currentSourceCodeEditorData)
+          ? this.currentSourceCodeEditorData
+          : this.currentSourceCodeEditorDataBeautify
+      )
+        .then(() => {
+          this.$bvToast.toast(`Исходный код скопирован`, {
+              title: 'Уведомление',
+              autoHideDelay: 2000,
+              appendToast: true,
+              variant: 'success',
+              toaster: 'b-toaster-top-center'
+          })
+        })
+        .catch(err => {
+          console.log('Something went wrong', err);
+        });
     },
     changeSourceData(data) {
       this.currentSourceCodeEditorData = data;
+      // Prism.highlightAll();
     },
     focusTitle() {
       let classList = this.$refs.titleInput[0].$el.classList;
@@ -320,7 +346,7 @@ export default {
     },
     closeTab(x) {
       for (let editor in this.editors) {
-        if(!this.editors.hasOwnProperty(editor)) continue;
+        if(!({}).hasOwnProperty.call(this.editors, editor)) continue;
 
         if (parseInt(editor) === x) {
           this.editors.splice(parseInt(editor), 1);
