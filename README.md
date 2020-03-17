@@ -1,7 +1,7 @@
 # Draft 
 ## Черновик для заметок!
 
-![Draft](../blob/master/src/assets/draft_screen.png)
+![Draft](../master/src/assets/draft_screen.png)
 
 Это просто черновик для заметок, который автоматически запоминает данные в LocalStorage браузера и при закрытии страницы данные не теряются.
 
