@@ -84,15 +84,11 @@
             </div>
 
             <b-modal id="sourceViewer" size="xl" centered title="Исходный код" >
-<!--              <prism-editor-->
-<!--                  :code="currentSourceCodeEditorDataBeautify"-->
-<!--                  language="html"-->
-<!--                  @change="changeSourceData"-->
-<!--              />-->
               <codemirror
                   ref="cmEditor"
-                  :value="currentSourceCodeEditorDataBeautify"
+                  :value="sourceCodeEditorDataBeautify"
                   :options="cmOptions"
+                  @ready="onCmReady"
                   @input="onCmCodeChange"
               />
 
@@ -237,8 +233,8 @@ export default {
       currentTabTimeWhileOpen: '',
       currentTabTimeWhileFocus: '',
       fixedSidebar: true,
-      currentSourceCodeEditorDataBeautify: '',
-      currentSourceCodeEditorData: '',
+      sourceCodeEditorDataBeautify: '',
+      sourceCodeEditorData: '',
       cmOptions: {
           tabSize: 2,
           mode: 'xml',
@@ -280,28 +276,24 @@ export default {
     }, 1000);
 
     document.addEventListener('showSourceModal', () => {
-      this.currentSourceCodeEditorDataBeautify = Beautify.html(
+      this.sourceCodeEditorDataBeautify = Beautify.html(
         this.editors[this.tabIndex].data
       );
       this.$bvModal.show('sourceViewer');
-      this.currentSourceCodeEditorData = '';
+      this.sourceCodeEditorData = '';
     });
 
     this.$root.$on('bv::modal::hide', (bvEvent, modalId) => {
       if (this.isModalOk(bvEvent, modalId)) {
-        this.editors[this.tabIndex].data = this.currentSourceCodeEditorData;
+        this.editors[this.tabIndex].data = this.sourceCodeEditorData;
       }
     })
   },
   methods: {
-    // onCmReady(cm) {
-    //   console.log(cm.getTextArea());
-    //   cm.getTextArea().focus();
-    // },
     isModalOk(bvEvent, modalId) {
       return modalId === 'sourceViewer'
         && bvEvent.trigger === 'ok'
-        && this.currentSourceCodeEditorData;
+        && this.sourceCodeEditorData;
     },
     copySource() {
       if (navigator.clipboard === undefined) {
@@ -315,10 +307,11 @@ export default {
 
         return;
       }
+
       navigator.clipboard.writeText(
-        (this.currentSourceCodeEditorData)
-          ? this.currentSourceCodeEditorData
-          : this.currentSourceCodeEditorDataBeautify
+        (this.sourceCodeEditorData)
+          ? this.sourceCodeEditorData
+          : this.sourceCodeEditorDataBeautify
       )
         .then(() => {
           this.$bvToast.toast(`Исходный код скопирован`, {
@@ -340,9 +333,14 @@ export default {
           console.error('Произошла ошибка при копировании в буфер', err);
         });
     },
+
     onCmCodeChange(data) {
-      this.currentSourceCodeEditorData = data;
+      this.sourceCodeEditorData = data;
     },
+    onCmReady() {
+
+    },
+
     downloadJSON() {
       let blob = new Blob([JSON.stringify(this.editors)], {type : 'application/json'});
       let link = document.createElement('a');
