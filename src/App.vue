@@ -16,7 +16,7 @@
             <button class="mr-3 btn btn-primary"
                     @click="toggleSidebar"
             ><i class="fas fa-bars"></i></button>
-            <span class="logo-title">Draft</span>
+            <span class="logo-title">Draftbook</span>
           </div>
         </template>
 
@@ -73,14 +73,50 @@
                 <span class="text-dark mr-2">Поле в фокусе:</span>
                 <span class="text-success">{{ currentTabTimeWhileFocus }}</span>
               </span>
+
               <a href="javascript:void(0);"
                  class="ml-auto py-0"
+                 v-if="showCheckList"
                  v-b-tooltip.hover.left="'Чек-лист для оценок'"
                  v-b-modal.modal-checklist
                  variant="link"
               >
                 Чек-лист
               </a>
+
+              <div
+                  v-if="!collapse && 0"
+                  class="import-wrapper ml-auto d-flex"
+              >
+                <b-button
+                    variant="light"
+                    @click="downloadJSON"
+                    size="sm"
+                >
+                  <i class="fas fa-download"></i>
+                  <span>Экспорт</span>
+                </b-button>
+                <b-form-file
+                    accept="application/json"
+                    class="btn btn-light"
+                    placeholder=""
+                    drop-placeholder=""
+                    v-model="jsonFile"
+                    size="sm"
+                >
+                  <i class="fas fa-upload"></i>
+                  <span>Импорт</span>
+                </b-form-file>
+                <b-button
+                    variant="light"
+                    @click="darkMode = !darkMode"
+                    size="sm"
+                >
+                  <i class="fa fas fa-paint-brush"></i>
+                  <span>Тема</span>
+                </b-button>
+              </div>
+
             </div>
 
             <b-modal id="sourceViewer" size="xl" centered title="Исходный код" >
@@ -116,42 +152,12 @@
             <i class="fas fa-plus"></i>
           </b-nav-item>
 
-          <div
-            v-if="!collapse && 0"
-            class="import-wrapper mt-auto d-flex"
-          >
-            <button
-              class="btn btn-light"
-              @click="downloadJSON"
-            >
-              <i class="fas fa-download"></i>
-              <span>Экспорт</span>
-            </button>
-            <b-form-file
-              accept="application/json"
-              class="btn btn-light"
-              placeholder=""
-              drop-placeholder=""
-              v-model="jsonFile"
-            >
-              <i class="fas fa-upload"></i>
-              <span>Импорт</span>
-            </b-form-file>
-            <button
-              class="btn btn-light"
-              @click="darkMode = !darkMode"
-            >
-              <i class="fa fas fa-paint-brush"></i>
-              <span>Тема</span>
-            </button>
-          </div>
-
           <div class="mt-auto d-flex justify-content-center fixed-checkbox-container">
             <b-form-checkbox
               v-model="fixedSidebar"
               name="check-button"
               button
-              button-variant="primary"
+              button-variant="link"
               v-b-tooltip="'Фиксирование сайдбара'"
               class="w-100"
             >
@@ -202,7 +208,7 @@ export default {
           name: 'Первая заметка',
           data: `
             <h2>Черновик для заметок!</h2>
-            <p>Это просто черновик для заметок, который автоматически запоминает данные в <code>LocalStorage</code> браузера и при закрытии страницы данные не теряются.</p>
+            <p>Это просто черновик для заметок, который автоматически запоминает данные в <code>LocalStorage</code> браузера, чтобы данные не потерялись ни при закрытии вкладки, ни при закрытии браузера.</p>
             <p>Удобно использовать для написания оценок, инструкций и прочего без создания документа, использования отдельного редактора.</p>
             <p>Запоминаются все вкладки. При очистке кеша всего браузера стираются и эти заметки из <code>LocalStorage</code>.</p>
             <blockquote>
@@ -233,6 +239,7 @@ export default {
       currentTabTimeWhileOpen: '',
       currentTabTimeWhileFocus: '',
       fixedSidebar: true,
+      showCheckList: false,
       sourceCodeEditorDataBeautify: '',
       sourceCodeEditorData: '',
       cmOptions: {
