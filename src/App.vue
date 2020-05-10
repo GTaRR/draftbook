@@ -1,18 +1,20 @@
 <template>
   <div id="app">
     <b-card no-body :class="{'dark-mode': darkMode}">
-      <b-tabs v-model="tabIndex"
-              pills
-              card
-              vertical
-              lazy
-              ref="tabsWrapper"
-              :nav-class="{'fixed-nav':fixedSidebar}"
-              nav-wrapper-class="nav-wrapper"
+      <b-tabs
+          v-model="tabIndex"
+          pills
+          card
+          vertical
+          lazy
+          ref="tabsWrapper"
+          :nav-class="{'fixed-nav':fixedSidebar}"
+          nav-wrapper-class="nav-wrapper"
       >
 
         <template slot="tabs-start">
           <div class="main-header py-3 px-3 d-flex align-items-center">
+            <div class="main-header__overlay"></div>
             <button class="mr-3 btn btn-primary"
                     @click="toggleSidebar"
             ><i class="fas fa-bars"></i></button>
@@ -58,7 +60,7 @@
             <div class="mt-3 d-flex align-items-center flex-wrap">
               <span class="mr-2">
                 <span class="text-dark mr-2">Заметка создана:</span>
-                <span class="text-success mr-2"
+                <span class="text-primary mr-2"
                       v-b-tooltip.hover
                       :title="editor.time.create | moment('Do MMMM YYYY, H:mm:ss')"
                 >
@@ -67,22 +69,12 @@
               </span>
               <span class="mr-2">
                 <span class="text-dark mr-2">Заметка открыта:</span>
-                <span class="text-success mr-2">{{ currentTabTimeWhileOpen }}</span>
+                <span class="text-primary mr-2">{{ currentTabTimeWhileOpen }}</span>
               </span>
               <span class="mr-2">
                 <span class="text-dark mr-2">Поле в фокусе:</span>
-                <span class="text-success">{{ currentTabTimeWhileFocus }}</span>
+                <span class="text-primary">{{ currentTabTimeWhileFocus }}</span>
               </span>
-
-              <a href="javascript:void(0);"
-                 class="ml-auto py-0"
-                 v-if="showCheckList"
-                 v-b-tooltip.hover.left="'Чек-лист для оценок'"
-                 v-b-modal.modal-checklist
-                 variant="link"
-              >
-                Чек-лист
-              </a>
 
               <div
                   v-if="!collapse && 0"
@@ -116,6 +108,8 @@
                   <span>Тема</span>
                 </b-button>
               </div>
+
+              <color-picker v-bind="color" @input="changeColor"></color-picker>
 
             </div>
 
@@ -152,18 +146,41 @@
             <i class="fas fa-plus"></i>
           </b-nav-item>
 
-          <div class="mt-auto d-flex justify-content-center fixed-checkbox-container">
+
+          <b-button-group class="mt-auto top-border">
+            <b-button
+                v-b-tooltip="'Экспорт в JSON'"
+                variant="light"
+                v-if="!collapse"
+                @click="downloadJSON"
+            >
+              <i class="fas fa-download"></i>
+            </b-button>
+            <b-button
+                v-b-tooltip="'Импорт из JSON'"
+                variant="light"
+                v-if="!collapse"
+                @click="uploadJSON"
+            >
+              <i class="fas fa-upload"></i>
+            </b-button>
+            <input
+                class="d-none"
+                type="file"
+                accept="application/json"
+                ref="fileInput"
+            >
             <b-form-checkbox
-              v-model="fixedSidebar"
-              name="check-button"
-              button
-              button-variant="link"
-              v-b-tooltip="'Фиксирование сайдбара'"
-              class="w-100"
+                title="Фиксирование сайдбара"
+                v-b-tooltip="'Фиксирование сайдбара'"
+                button-variant="light"
+                v-model="fixedSidebar"
+                button
+                class="flex-fill fixed-checkbox"
             >
               <i class="fas fa-thumbtack"></i>
             </b-form-checkbox>
-          </div>
+          </b-button-group>
 
         </template>
 
@@ -175,29 +192,17 @@
       </b-tabs>
     </b-card>
 
-    <b-modal id="modal-checklist" title="Чек-лист для оценок" hide-footer>
-      <div class="mt-2">
-        <ul class="list-group mb-3">
-          <li class="list-group-item">Нужно ли создавать <strong>резервную копию</strong>?</li>
-          <li class="list-group-item">Нужно ли <strong>переносить</strong> изменения <strong>на боевой</strong>?</li>
-          <li class="list-group-item">Нужно ли создавать <strong>копию</strong> сайта <strong>на тестовом сервере</strong>?</li>
-          <li class="list-group-item">Учтён ли <strong>адаптив</strong> в вёрстке?</li>
-          <li class="list-group-item"><strong>Макет</strong> для верстки в адекватном формате?</li>
-        </ul>
-        <p class="text-center mb-1">Есть ещё варианты? Пишите: <a href="mailto:vs@site-master.su">vs@site-master.su</a></p>
-      </div>
-    </b-modal>
-
   </div>
 </template>
 
 <script>
 import ClassicEditor from './ckeditor';
-
-import Beautify from 'js-beautify'
+import Beautify from 'js-beautify';
+import ColorPicker from '@radial-color-picker/vue-color-picker';
 
 export default {
   name: 'app',
+  components: { ColorPicker },
   data(){
     return {
       classicEditor: ClassicEditor,
@@ -230,29 +235,79 @@ export default {
       tabIndex: 0,
       tabCounter: 1,
       activeEditor: 0,
+
+      // options
+      fixedSidebar: true,
       collapse: false,
       darkMode: false,
+
+      // import/export data
       jsonFile: null,
+
+      // time
       interval: null,
       inFocus: false,
       currentTabTimeDiff: '',
       currentTabTimeWhileOpen: '',
       currentTabTimeWhileFocus: '',
-      fixedSidebar: true,
-      showCheckList: false,
+
+      // source editor
       sourceCodeEditorDataBeautify: '',
       sourceCodeEditorData: '',
       cmOptions: {
-          tabSize: 2,
-          mode: 'xml',
-          htmlMode: true,
-          matchClosing: true,
-          theme: '3024-day',
-          lineNumbers: true,
-          line: true,
-          lineWrapping: false,
-          autofocus: true,
+        tabSize: 2,
+        mode: 'xml',
+        htmlMode: true,
+        matchClosing: true,
+        theme: '3024-day',
+        lineNumbers: true,
+        line: true,
+        lineWrapping: false,
+        autofocus: true,
       },
+
+      // theme colors
+      color: {
+        hue: 163,
+        saturation: 38,
+        luminosity: 62,
+        alpha: 1
+      },
+      theme: 'mint',
+      themes: [
+        {
+          name: 'mint',
+          primary: {
+            hue: 163,
+            saturation: 38,
+            luminosity: 62
+          },
+          background: '#fff',
+          light: '#eee',
+          gray: {
+            400: "#ced4da",
+            500: "#aaa",
+            700: "#5a5a5a",
+          },
+          dark: false
+        },
+        {
+          name: 'dark',
+          primary: {
+            hue: 163,
+            saturation: 38,
+            luminosity: 62
+          },
+          background: '#202020',
+          light: '#eee',
+          gray: {
+            400: "#ced4da",
+            500: "#aaa",
+            700: "#5a5a5a",
+          },
+          dark: true
+        },
+      ]
     }
   },
   created: function(){
@@ -268,16 +323,18 @@ export default {
       this.tabCounter++;
     }
     this.editors.map(item => {
-        if(typeof item.time === 'undefined') {
-            item.time = {
-                create: this.$moment(),
-                open: 0,
-                focus: 0
-            }
+      if(typeof item.time === 'undefined') {
+        item.time = {
+          create: this.$moment(),
+          open: 0,
+          focus: 0
         }
+      }
     });
   },
   mounted(){
+    let that = this;
+
     this.interval = setInterval(() => {
       this.tick();
     }, 1000);
@@ -294,9 +351,83 @@ export default {
       if (this.isModalOk(bvEvent, modalId)) {
         this.editors[this.tabIndex].data = this.sourceCodeEditorData;
       }
-    })
+    });
+
+    // импорт JSON
+    this.$refs.fileInput.addEventListener('change', function () {
+      if (this.files && this.files.length > 0) {
+        let file = this.files[0];
+
+        let reader = new FileReader();
+
+        reader.readAsText(file);
+
+        reader.onload = function() {
+          that.editors = JSON.parse(reader.result);
+        };
+
+        reader.onerror = function() {
+          console.log(reader.error);
+        };
+      }
+    });
+
+    // Применение темы
+    this.changeTheme('dark');
   },
   methods: {
+    changeColor(hue) {
+      this.color.hue = hue;
+
+      let color = `hsl(${this.color.hue},${this.color.saturation}%,${this.color.luminosity}%)`;
+      let hoverColor = `hsl(${this.color.hue},${this.color.saturation}%,${this.color.luminosity-7.5}%)`;
+      let activeColor = `hsl(${this.color.hue},${this.color.saturation}%,${this.color.luminosity-10}%)`;
+      let transparentColor = `hsla(${this.color.hue},${this.color.saturation}%,${this.color.luminosity}%, 0.5)`;
+
+      let colors = [
+        ['--primary', color],
+        ['--primary-hover', hoverColor],
+        ['--primary-active', activeColor],
+        ['--primary-light', transparentColor],
+      ];
+
+      for (let item of colors) {
+          document.documentElement.style.setProperty(item[0], item[1]);
+      }
+    },
+    changeTheme(themeName) {
+      let themes = this.themes.filter(theme => theme.name === themeName);
+      if (themes.length < 1) return;
+
+      let {primary, background, light, gray, dark} = themes[0];
+
+      let color = `hsl(${primary.hue},${primary.saturation}%,${primary.luminosity}%)`;
+      let hoverColor = `hsl(${primary.hue},${primary.saturation}%,${primary.luminosity-7.5}%)`;
+      let activeColor = `hsl(${primary.hue},${primary.saturation}%,${primary.luminosity-10}%)`;
+      let transparentColor = `hsla(${primary.hue},${primary.saturation}%,${primary.luminosity}%, 0.5)`;
+
+      let colors = [
+        ['--primary', color],
+        ['--primary-hover', hoverColor],
+        ['--primary-active', activeColor],
+        ['--primary-light', transparentColor],
+        ['--background', background],
+        ['--light-hover', light],
+        ['--gray-500', gray["500"]],
+        ['--gray-700', gray["700"]],
+      ];
+
+      for (let item of colors) {
+        document.documentElement.style.setProperty(item[0], item[1]);
+      }
+
+      if (dark) {
+        document.body.classList.add('dark');
+      } else {
+        document.body.classList.remove('dark');
+      }
+    },
+
     isModalOk(bvEvent, modalId) {
       return modalId === 'sourceViewer'
         && bvEvent.trigger === 'ok'
@@ -331,11 +462,11 @@ export default {
         })
         .catch(err => {
           this.$bvToast.toast(`Произошла ошибка при копировании в буфер`, {
-              title: 'Ошибка',
-              autoHideDelay: 2000,
-              appendToast: true,
-              variant: 'danger',
-              toaster: 'b-toaster-top-center'
+            title: 'Ошибка',
+            autoHideDelay: 2000,
+            appendToast: true,
+            variant: 'danger',
+            toaster: 'b-toaster-top-center'
           });
           console.error('Произошла ошибка при копировании в буфер', err);
         });
@@ -355,6 +486,12 @@ export default {
       link.download = 'draft.json';
       link.click();
     },
+    uploadJSON() {
+      this.$refs.fileInput.click();
+    },
+    loadFile(input) {
+      console.log(input);
+    },
     changeData() {
       if (!document.hidden) {
         localStorage.setItem('multiple_cke_data', JSON.stringify(this.editors));
@@ -362,20 +499,20 @@ export default {
     },
 
     focusTitle() {
-        let classList = this.$refs.titleInput[0].$el.classList;
+      let classList = this.$refs.titleInput[0].$el.classList;
 
-        this.$refs.titleInput[0].focus();
-        classList.add('animated');
-        classList.add('shake');
+      this.$refs.titleInput[0].focus();
+      classList.add('animated');
+      classList.add('shake');
 
-        setTimeout(() => {
-            classList.remove('animated');
-            classList.remove('shake');
-        }, 1000);
+      setTimeout(() => {
+        classList.remove('animated');
+        classList.remove('shake');
+      }, 1000);
     },
     toggleSidebar() {
-        this.collapse = !this.collapse;
-        this.$refs.tabsWrapper.$el.classList.toggle('collapse-tabs');
+      this.collapse = !this.collapse;
+      this.$refs.tabsWrapper.$el.classList.toggle('collapse-tabs');
     },
     closeTab(x) {
       for (let editor in this.editors) {
@@ -393,22 +530,22 @@ export default {
         name: 'Новая заметка',
         data: 'Текст заметки ' + this.tabCounter,
         time: {
-            create: this.$moment(),
-            open: 0,
-            focus: 0
+          create: this.$moment(),
+          open: 0,
+          focus: 0
         }
       });
       this.tabCounter++;
       localStorage.setItem('multiple_cke_data', JSON.stringify(this.editors));
     },
     clickTab(tabId) {
-        this.activeEditor = tabId;
+      this.activeEditor = tabId;
     },
 
     tick() {
       this.editors[this.tabIndex].time.open += 1000;
       if(this.inFocus) {
-          this.editors[this.tabIndex].time.focus += 1000;
+        this.editors[this.tabIndex].time.focus += 1000;
       }
       this.setCurrentTabTimeWhileFocus();
       this.setCurrentTabTimeWhileOpen();
@@ -448,3 +585,7 @@ export default {
   }
 }
 </script>
+
+<style>
+  @import '~@radial-color-picker/vue-color-picker/dist/vue-color-picker.min.css';
+</style>

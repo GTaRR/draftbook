@@ -1,0 +1,21 @@
+.fixed-nav
+  position: fixed
+  overflow-x: hidden
+  overflow-y: auto
+  max-height: 100vh
+
+.fixed-checkbox-container .btn
+  width: 100%
+  background-color: var(--light)
+  &:hover
+    background-color: var(--light-hover)
+  &:not(.active)
+    i
+      transform: rotate(30deg) translate(2px, -2px)
+
+.fixed-checkbox .btn
+  width: 100%
+  &.active, &:focus, &:not(:disabled):active, &.focus
+    i
+      color: var(--primary)
+      filter: saturate(0.75) brightness(0.85)
