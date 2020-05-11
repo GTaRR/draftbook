@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <b-card no-body :class="{'dark-mode': darkMode}">
+    <b-card no-body :class="{dark: darkMode, colored: coloredMode}">
       <b-tabs
           v-model="tabIndex"
           pills
@@ -113,7 +113,33 @@
 
             </div>
 
-            <b-modal id="sourceViewer" size="xl" centered title="Исходный код" >
+            <b-modal id="settingsModal" size="xl" centered title="Настройки">
+              <h4>Тема</h4>
+              <hr>
+              <div class="theme-list">
+                <div class="theme-item default">
+                  <div class="theme-sidebar"></div>
+                  <div class="theme-body"></div>
+                </div>
+
+                <div class="theme-item colored">
+                  <div class="theme-sidebar"></div>
+                  <div class="theme-body"></div>
+                </div>
+
+                <div class="theme-item dark">
+                  <div class="theme-sidebar"></div>
+                  <div class="theme-body"></div>
+                </div>
+
+                <div class="theme-item colored-dark">
+                  <div class="theme-sidebar"></div>
+                  <div class="theme-body"></div>
+                </div>
+              </div>
+            </b-modal>
+
+            <b-modal id="sourceViewer" size="xl" centered title="Исходный код">
               <codemirror
                   ref="cmEditor"
                   :value="sourceCodeEditorDataBeautify"
@@ -123,7 +149,7 @@
               />
 
               <template v-slot:modal-footer="{ ok }">
-                <b-button variant="success" @click="ok()">
+                <b-button variant="primary" @click="ok()">
                   <i class="fas fa-save mr-2"></i>Сохранить
                 </b-button>
                 <b-button variant="dark" @click="copySource" ref="copyInBufferBtn">
@@ -149,9 +175,28 @@
 
           <b-button-group class="mt-auto top-border">
             <b-button
+              v-b-tooltip="'Настройки'"
+              variant="light"
+              v-if="!collapse"
+              @click="openSettings"
+            >
+              <i class="fas fa-cog"></i>
+            </b-button>
+            <b-form-checkbox
+              title="Темная тема"
+              v-b-tooltip="'Темная тема'"
+              button-variant="light"
+              v-model="darkMode"
+              @change="darkModeChange"
+              button
+              class="flex-fill fixed-checkbox"
+            >
+              <i class="fas fa-moon"></i>
+            </b-form-checkbox>
+            <b-button
                 v-b-tooltip="'Экспорт в JSON'"
                 variant="light"
-                v-if="!collapse"
+                v-if="!collapse && 0"
                 @click="downloadJSON"
             >
               <i class="fas fa-download"></i>
@@ -159,7 +204,7 @@
             <b-button
                 v-b-tooltip="'Импорт из JSON'"
                 variant="light"
-                v-if="!collapse"
+                v-if="!collapse && 0"
                 @click="uploadJSON"
             >
               <i class="fas fa-upload"></i>
@@ -239,7 +284,6 @@ export default {
       // options
       fixedSidebar: true,
       collapse: false,
-      darkMode: false,
 
       // import/export data
       jsonFile: null,
@@ -266,46 +310,101 @@ export default {
         autofocus: true,
       },
 
-      // theme colors
+      // theme
       color: {
         hue: 163,
         saturation: 38,
         luminosity: 62,
         alpha: 1
       },
-      theme: 'mint',
+      darkMode: false,
+      coloredMode: false,
+      customColor: false,
+      theme: 'colored-dark',
       themes: [
         {
-          name: 'mint',
+          name: 'default',
           primary: {
             hue: 163,
             saturation: 38,
             luminosity: 62
           },
           background: '#fff',
-          light: '#eee',
+          sidebarBackground: '#fff',
+          light: '#f8f9fa',
+          lightHover: '#eee',
+          lightActive: '#eee',
           gray: {
             400: "#ced4da",
             500: "#aaa",
             700: "#5a5a5a",
+            800: "#343a40",
           },
-          dark: false
+          dark: false,
+          colored: false,
         },
         {
           name: 'dark',
           primary: {
             hue: 163,
-            saturation: 38,
-            luminosity: 62
+            saturation: 25,
+            luminosity: 48
           },
           background: '#202020',
-          light: '#eee',
+          sidebarBackground: '#202020',
+          light: '#252424',
+          lightHover: '#2d2d2d',
+          lightActive: '#1b1b1b',
+          gray: {
+            400: "#45403c",
+            500: "#606060",
+            700: "#ccc",
+            800: "#ccc",
+          },
+          dark: true,
+          colored: false,
+        },
+        {
+          name: 'colored',
+          primary: {
+            hue: 163,
+            saturation: 36,
+            luminosity: 62
+          },
+          background: '#fff',
+          sidebarBackground: '#fff',
+          light: '#f8f9fa',
+          lightHover: '#eee',
+          lightActive: '#eee',
           gray: {
             400: "#ced4da",
             500: "#aaa",
             700: "#5a5a5a",
+            800: "#343a40",
           },
-          dark: true
+          dark: false,
+          colored: true,
+        },
+        {
+          name: 'colored-dark',
+          primary: {
+            hue: 163,
+            saturation: 38,
+            luminosity: 54
+          },
+          background: '#202020',
+          sidebarBackground: '#202020',
+          light: '#252424',
+          lightHover: '#2d2d2d',
+          lightActive: '#393334',
+          gray: {
+            400: "#45403c",
+            500: "#606060",
+            700: "#ccc",
+            800: "#ccc",
+          },
+          dark: true,
+          colored: true,
         },
       ]
     }
@@ -331,6 +430,16 @@ export default {
         }
       }
     });
+  },
+  watch: {
+    darkMode(darkmode) {
+      if (darkmode) document.body.classList.add('dark');
+      else document.body.classList.remove('dark');
+    },
+    coloredMode(colored) {
+      if (colored) document.body.classList.add('colored');
+      else document.body.classList.remove('colored');
+    }
   },
   mounted(){
     let that = this;
@@ -373,59 +482,134 @@ export default {
     });
 
     // Применение темы
-    this.changeTheme('dark');
+    this.changeTheme(this.theme);
   },
   methods: {
+    darkModeChange(dark) {
+      this.darkMode = dark;
+      let colored = this.coloredMode;
+
+      if (colored && dark) {
+        this.changeTheme('colored-dark');
+      }
+      if (!colored && dark) {
+        this.changeTheme('dark');
+      }
+      if (!colored && !dark) {
+        this.changeTheme('default');
+      }
+      if (colored && !dark) {
+        this.changeTheme('colored');
+      }
+
+      if (this.customColor) {
+        this.changeColor(this.color.hue);
+      }
+    },
+    openSettings() {
+      this.$bvModal.show('settingsModal');
+    },
     changeColor(hue) {
       this.color.hue = hue;
 
-      let color = `hsl(${this.color.hue},${this.color.saturation}%,${this.color.luminosity}%)`;
-      let hoverColor = `hsl(${this.color.hue},${this.color.saturation}%,${this.color.luminosity-7.5}%)`;
-      let activeColor = `hsl(${this.color.hue},${this.color.saturation}%,${this.color.luminosity-10}%)`;
-      let transparentColor = `hsla(${this.color.hue},${this.color.saturation}%,${this.color.luminosity}%, 0.5)`;
+      const activeTheme = this.themes.filter(theme => theme.name === this.theme)[0];
+      let themeIndex = null;
 
-      let colors = [
-        ['--primary', color],
-        ['--primary-hover', hoverColor],
-        ['--primary-active', activeColor],
-        ['--primary-light', transparentColor],
-      ];
+      this.themes.forEach((theme, index) => {
+        if (theme.name === 'custom') {
+          themeIndex = index;
+        }
+      });
 
-      for (let item of colors) {
-          document.documentElement.style.setProperty(item[0], item[1]);
+      let customTheme = Object.assign({}, activeTheme);
+      customTheme.name = 'custom';
+      customTheme.primary.hue = hue;
+
+      if (themeIndex === null) {
+        this.themes.push(customTheme);
+        themeIndex = this.themes.length;
+      } else {
+        this.themes[themeIndex] = customTheme;
       }
+
+      this.changeTheme('custom');
+      this.customColor = true;
     },
-    changeTheme(themeName) {
-      let themes = this.themes.filter(theme => theme.name === themeName);
-      if (themes.length < 1) return;
+    changeTheme(name) {
+      console.log(name);
 
-      let {primary, background, light, gray, dark} = themes[0];
+      const theme = this.themes.filter(theme => theme.name === name)[0];
+      if (!theme) return;
 
-      let color = `hsl(${primary.hue},${primary.saturation}%,${primary.luminosity}%)`;
-      let hoverColor = `hsl(${primary.hue},${primary.saturation}%,${primary.luminosity-7.5}%)`;
-      let activeColor = `hsl(${primary.hue},${primary.saturation}%,${primary.luminosity-10}%)`;
-      let transparentColor = `hsla(${primary.hue},${primary.saturation}%,${primary.luminosity}%, 0.5)`;
+      let {
+        primary,
+        background,
+        sidebarBackground,
+        light,
+        lightHover,
+        lightActive,
+        gray,
+        dark,
+        colored
+      } = theme;
 
-      let colors = [
-        ['--primary', color],
-        ['--primary-hover', hoverColor],
-        ['--primary-active', activeColor],
-        ['--primary-light', transparentColor],
+      // Поправки
+      let hoverIncrement =                (dark) ? -7.5 : 7.5;
+      let activeIncrement =               (dark) ? 2.5  : 10;
+      let lightLuminosityDecrement =      (dark) ? 15   : 5;
+      let backgroundLuminosityDecrement = (dark) ? 30   : 0;
+      let backgroundOpacity =             (dark) ? 0.75 : 0.15;
+      let lightHoverDecrement =           (dark) ? 2.5  : 15;
+      let lightActiveDecrement =          (dark) ? 5   : 20;
+      let lightOpacity =                  (dark) ? 1    : .25;
+
+      const mainColor = `hsl(${primary.hue},${primary.saturation}%,${primary.luminosity}%)`;
+      const hoverMainColor = `hsl(${primary.hue},${primary.saturation}%,${primary.luminosity-hoverIncrement}%)`;
+      const activeMainColor = `hsl(${primary.hue},${primary.saturation}%,${primary.luminosity-activeIncrement}%)`;
+      const lightMainColor = `hsla(${primary.hue},${primary.saturation}%,${primary.luminosity}%, 0.5)`;
+      let link = mainColor;
+      let linkHover = activeMainColor;
+
+      if (colored) {
+        light = `hsla(${primary.hue},30%,${primary.luminosity-lightLuminosityDecrement}%, ${lightOpacity})`;
+        lightHover = `hsla(${primary.hue},30%,${primary.luminosity-lightLuminosityDecrement-lightHoverDecrement}%, ${lightOpacity})`;
+        lightActive = `hsla(${primary.hue},30%,${primary.luminosity-lightLuminosityDecrement-lightActiveDecrement}%, ${lightOpacity})`;
+        sidebarBackground = `hsla(${primary.hue},${primary.saturation}%,${primary.luminosity-backgroundLuminosityDecrement}%, ${backgroundOpacity})`;
+
+        if (dark) {
+          link = linkHover = '#fff';
+        } else {
+          link = linkHover = `hsl(${primary.hue},${primary.saturation}%, 30%)`;
+        }
+      }
+
+      const colors = [
+        ['--primary', mainColor],
+        ['--primary-hover', hoverMainColor],
+        ['--primary-active', activeMainColor],
+        ['--primary-light', lightMainColor],
+        ['--link', link],
+        ['--link-hover', linkHover],
         ['--background', background],
-        ['--light-hover', light],
+        ['--sidebar-background', sidebarBackground],
+        ['--light', light],
+        ['--light-hover', lightHover],
+        ['--light-active', lightActive],
+        ['--gray-400', gray["400"]],
         ['--gray-500', gray["500"]],
         ['--gray-700', gray["700"]],
+        ['--gray-800', gray["800"]],
       ];
 
-      for (let item of colors) {
-        document.documentElement.style.setProperty(item[0], item[1]);
+      for (let color of colors) {
+        if (!color[0] || !color[1]) return;
+
+        document.documentElement.style.setProperty(color[0], color[1]);
       }
 
-      if (dark) {
-        document.body.classList.add('dark');
-      } else {
-        document.body.classList.remove('dark');
-      }
+      this.theme = name;
+      this.darkMode = dark;
+      this.coloredMode = colored;
     },
 
     isModalOk(bvEvent, modalId) {

@@ -1,14 +1,12 @@
 .card, .tabs, .tab-pane
   height: 100%
 
-.ck-editor__editable_inline
-  //min-height: 84vh
-  min-height: calc(100vh - (128px) - 3.125rem) // 100vh - шапка - отступ внизу
-  @media (max-width: 957px)
-    min-height: calc(100vh - (128px + 25px) - 3.125rem) // 100vh - шапка - отступ внизу
+body
+  background-color: var(--background)
 
 .card
   border: none
+  background-color: var(--background)
   &-body
     padding: 0 1.125rem 1.125rem
   &-header
@@ -30,5 +28,18 @@
 .tab-content
   background-color: var(--background)
 
-.dark .ck-editor
-  filter: invert(1) contrast(75%)
+.modal-content
+  border-radius: 0
+
+.form-control
+  border-left: none
+  border-top: none
+  border-right: none
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, color 0.15s ease-in-out
+  color: var(--primary)
+  background-color: var(--background)
+  border-color: var(--gray-400)
+  .card-text &:focus
+    color: var(--gray-700)
+    border-color: var(--gray-500)
+    background-color: var(--background)

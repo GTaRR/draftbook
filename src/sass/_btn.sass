@@ -1,0 +1,37 @@
+.btn-light
+  color: var(--link)
+  background-color: var(--light)
+  border-color: var(--light)
+  .colored &
+    border-color: transparent
+  &:hover
+    color: var(--link)
+    background-color: var(--light-hover)
+    border-color: var(--light-hover)
+
+.btn-primary
+  color: var(--white)
+  background-color: var(--primary)
+  border-color: var(--primary)
+  &:not(:disabled):not(.disabled):hover, &:not(:disabled):not(.disabled).hover
+    color: var(--white)
+    background-color: var(--primary-hover)
+    border-color: var(--primary-hover)
+  &:not(:disabled):not(.disabled):active, &:not(:disabled):not(.disabled).active, .show > &.dropdown-toggle
+    color: var(--white)
+    background-color: var(--primary-active)
+    border-color: var(--primary-active)
+  &:focus, &.focus
+    color: var(--white)
+    background-color: var(--primary-hover)
+    border-color: var(--primary-hover)
+    box-shadow: 0 0 0 0.2rem var(--primary-light)
+  &:not(:disabled):not(.disabled):active:focus, &:not(:disabled):not(.disabled).active:focus, .show > &.dropdown-toggle:focus
+    box-shadow: 0 0 0 0.2rem var(--primary-light)
+
+.btn-light:not(:disabled):not(.disabled):active, .btn-light:not(:disabled):not(.disabled).active, .show > .btn-light.dropdown-toggle
+  background-color: var(--light-active)
+  border-color: var(--light-active)
+
+.btn-link:focus
+  text-decoration: none
