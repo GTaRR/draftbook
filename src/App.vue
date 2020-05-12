@@ -117,23 +117,35 @@
               <h4>Тема</h4>
               <hr>
               <div class="theme-list">
-                <div class="theme-item default">
-                  <div class="theme-sidebar"></div>
+                <div class="theme-item default active">
+                  <div class="theme-sidebar">
+                    <div class="theme-sidebar__top"></div>
+                    <div class="theme-sidebar__bottom"></div>
+                  </div>
                   <div class="theme-body"></div>
                 </div>
 
                 <div class="theme-item colored">
-                  <div class="theme-sidebar"></div>
+                  <div class="theme-sidebar">
+                    <div class="theme-sidebar__top"></div>
+                    <div class="theme-sidebar__bottom"></div>
+                  </div>
                   <div class="theme-body"></div>
                 </div>
 
                 <div class="theme-item dark">
-                  <div class="theme-sidebar"></div>
+                  <div class="theme-sidebar">
+                    <div class="theme-sidebar__top"></div>
+                    <div class="theme-sidebar__bottom"></div>
+                  </div>
                   <div class="theme-body"></div>
                 </div>
 
-                <div class="theme-item colored-dark">
-                  <div class="theme-sidebar"></div>
+                <div class="theme-item colored dark">
+                  <div class="theme-sidebar">
+                    <div class="theme-sidebar__top"></div>
+                    <div class="theme-sidebar__bottom"></div>
+                  </div>
                   <div class="theme-body"></div>
                 </div>
               </div>
@@ -320,7 +332,7 @@ export default {
       darkMode: false,
       coloredMode: false,
       customColor: false,
-      theme: 'colored-dark',
+      theme: 'default',
       themes: [
         {
           name: 'default',
