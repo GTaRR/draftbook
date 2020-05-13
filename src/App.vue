@@ -109,15 +109,17 @@
                 </b-button>
               </div>
 
-              <color-picker v-bind="color" @input="changeColor"></color-picker>
-
             </div>
 
             <b-modal id="settingsModal" size="xl" centered title="Настройки">
               <h4>Тема</h4>
               <hr>
               <div class="theme-list">
-                <div class="theme-item default active">
+                <div
+                  class="theme-item default"
+                  @click="changeTheme('default')"
+                  :class="{active: theme === 'default'}"
+                >
                   <div class="theme-sidebar">
                     <div class="theme-sidebar__top"></div>
                     <div class="theme-sidebar__bottom"></div>
@@ -125,7 +127,11 @@
                   <div class="theme-body"></div>
                 </div>
 
-                <div class="theme-item colored">
+                <div
+                  class="theme-item colored"
+                  @click="changeTheme('colored')"
+                  :class="{active: theme === 'colored'}"
+                >
                   <div class="theme-sidebar">
                     <div class="theme-sidebar__top"></div>
                     <div class="theme-sidebar__bottom"></div>
@@ -133,7 +139,11 @@
                   <div class="theme-body"></div>
                 </div>
 
-                <div class="theme-item dark">
+                <div
+                  class="theme-item dark"
+                  @click="changeTheme('dark')"
+                  :class="{active: theme === 'dark'}"
+                >
                   <div class="theme-sidebar">
                     <div class="theme-sidebar__top"></div>
                     <div class="theme-sidebar__bottom"></div>
@@ -141,7 +151,11 @@
                   <div class="theme-body"></div>
                 </div>
 
-                <div class="theme-item colored dark">
+                <div
+                  class="theme-item colored dark"
+                  @click="changeTheme('colored-dark')"
+                  :class="{active: theme === 'colored-dark'}"
+                >
                   <div class="theme-sidebar">
                     <div class="theme-sidebar__top"></div>
                     <div class="theme-sidebar__bottom"></div>
@@ -149,6 +163,8 @@
                   <div class="theme-body"></div>
                 </div>
               </div>
+
+              <color-picker v-bind="color" @input="changeColor"></color-picker>
             </b-modal>
 
             <b-modal id="sourceViewer" size="xl" centered title="Исходный код">
@@ -336,11 +352,8 @@ export default {
       themes: [
         {
           name: 'default',
-          primary: {
-            hue: 163,
-            saturation: 38,
-            luminosity: 62
-          },
+          saturation: 38,
+          luminosity: 62,
           background: '#fff',
           sidebarBackground: '#fff',
           light: '#f8f9fa',
@@ -357,11 +370,8 @@ export default {
         },
         {
           name: 'dark',
-          primary: {
-            hue: 163,
-            saturation: 25,
-            luminosity: 48
-          },
+          saturation: 25,
+          luminosity: 48,
           background: '#202020',
           sidebarBackground: '#202020',
           light: '#252424',
@@ -378,11 +388,8 @@ export default {
         },
         {
           name: 'colored',
-          primary: {
-            hue: 163,
-            saturation: 36,
-            luminosity: 62
-          },
+          saturation: 36,
+          luminosity: 62,
           background: '#fff',
           sidebarBackground: '#fff',
           light: '#f8f9fa',
@@ -399,11 +406,8 @@ export default {
         },
         {
           name: 'colored-dark',
-          primary: {
-            hue: 163,
-            saturation: 38,
-            luminosity: 54
-          },
+          saturation: 32,
+          luminosity: 54,
           background: '#202020',
           sidebarBackground: '#202020',
           light: '#252424',
@@ -523,38 +527,16 @@ export default {
     },
     changeColor(hue) {
       this.color.hue = hue;
-
-      const activeTheme = this.themes.filter(theme => theme.name === this.theme)[0];
-      let themeIndex = null;
-
-      this.themes.forEach((theme, index) => {
-        if (theme.name === 'custom') {
-          themeIndex = index;
-        }
-      });
-
-      let customTheme = Object.assign({}, activeTheme);
-      customTheme.name = 'custom';
-      customTheme.primary.hue = hue;
-
-      if (themeIndex === null) {
-        this.themes.push(customTheme);
-        themeIndex = this.themes.length;
-      } else {
-        this.themes[themeIndex] = customTheme;
-      }
-
-      this.changeTheme('custom');
       this.customColor = true;
+      this.changeTheme(this.theme);
     },
     changeTheme(name) {
-      console.log(name);
-
       const theme = this.themes.filter(theme => theme.name === name)[0];
       if (!theme) return;
 
       let {
-        primary,
+        saturation: s,
+        luminosity: l,
         background,
         sidebarBackground,
         light,
@@ -565,33 +547,36 @@ export default {
         colored
       } = theme;
 
+      let h = this.color.hue;
+
       // Поправки
       let hoverIncrement =                (dark) ? -7.5 : 7.5;
       let activeIncrement =               (dark) ? 2.5  : 10;
       let lightLuminosityDecrement =      (dark) ? 15   : 5;
-      let backgroundLuminosityDecrement = (dark) ? 30   : 0;
+      let backgroundLuminosityDecrement = (dark) ? 35   : 0;
       let backgroundOpacity =             (dark) ? 0.75 : 0.15;
       let lightHoverDecrement =           (dark) ? 2.5  : 15;
       let lightActiveDecrement =          (dark) ? 5   : 20;
       let lightOpacity =                  (dark) ? 1    : .25;
 
-      const mainColor = `hsl(${primary.hue},${primary.saturation}%,${primary.luminosity}%)`;
-      const hoverMainColor = `hsl(${primary.hue},${primary.saturation}%,${primary.luminosity-hoverIncrement}%)`;
-      const activeMainColor = `hsl(${primary.hue},${primary.saturation}%,${primary.luminosity-activeIncrement}%)`;
-      const lightMainColor = `hsla(${primary.hue},${primary.saturation}%,${primary.luminosity}%, 0.5)`;
+      const mainColor = `hsl(${h},${s}%,${l}%)`;
+      const hoverMainColor = `hsl(${h},${s}%,${l-hoverIncrement}%)`;
+      const activeMainColor = `hsl(${h},${s}%,${l-activeIncrement}%)`;
+      const lightMainColor = `hsla(${h},${s}%,${l}%, 0.5)`;
       let link = mainColor;
       let linkHover = activeMainColor;
 
       if (colored) {
-        light = `hsla(${primary.hue},30%,${primary.luminosity-lightLuminosityDecrement}%, ${lightOpacity})`;
-        lightHover = `hsla(${primary.hue},30%,${primary.luminosity-lightLuminosityDecrement-lightHoverDecrement}%, ${lightOpacity})`;
-        lightActive = `hsla(${primary.hue},30%,${primary.luminosity-lightLuminosityDecrement-lightActiveDecrement}%, ${lightOpacity})`;
-        sidebarBackground = `hsla(${primary.hue},${primary.saturation}%,${primary.luminosity-backgroundLuminosityDecrement}%, ${backgroundOpacity})`;
+        light = `hsla(${h},30%,${l-lightLuminosityDecrement}%, ${lightOpacity})`;
+        lightHover = `hsla(${h},30%,${l-lightLuminosityDecrement-lightHoverDecrement}%, ${lightOpacity})`;
+        lightActive = `hsla(${h},40%,${l-lightLuminosityDecrement-lightActiveDecrement}%, ${lightOpacity})`;
+        sidebarBackground = `hsla(${h},${s}%,${l-backgroundLuminosityDecrement}%, ${backgroundOpacity})`;
 
         if (dark) {
           link = linkHover = '#fff';
+          sidebarBackground = `hsla(${h},10%,15%, ${backgroundOpacity})`;
         } else {
-          link = linkHover = `hsl(${primary.hue},${primary.saturation}%, 30%)`;
+          link = linkHover = `hsl(${h},${s}%, 30%)`;
         }
       }
 

@@ -6,17 +6,16 @@
   display: flex
   width: 220px
   height: 160px
-  border: 1px solid #ccc
+  outline: 1px solid #ccc
   cursor: pointer
   background-color: #fff
-  transition: border-color .2s
+  transition: all .2s
   &:hover
-    border-color: #777
+    opacity: 0.85
   & + &
     margin-left: 16px
   &.active
-    outline: 1px solid var(--primary)
-    border-color: var(--primary)
+    outline: 2px solid var(--primary)
 .theme-sidebar
   width: 20%
   display: flex
@@ -38,8 +37,8 @@ body.dark
   .theme-list
     filter: invert(1)
   .theme-item
-    border: 1px solid #202020
-    &:hover
-      border-color: #ccc
+    outline: 1px solid #202020
     &.active
-      border-color: var(--primary)
+      outline: 2px solid var(--primary)
+  .rcp
+    filter: invert(1)

@@ -10,7 +10,7 @@
   &:hover
     background-color: var(--light-hover)
   &:not(.active)
-    i
+    i.fa-thumbtack
       transform: rotate(30deg) translate(2px, -2px)
 
 .fixed-checkbox .btn
@@ -19,3 +19,5 @@
     i
       color: var(--link)
       filter: saturate(0.75) brightness(0.85)
+      .dark &
+        filter: saturate(1.5) brightness(1.15)
