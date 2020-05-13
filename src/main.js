@@ -11,6 +11,8 @@ import 'codemirror/mode/xml/xml.js'
 import moment from 'moment';
 require('moment/locale/ru');
 
+import store from './store'
+
 import '@fortawesome/fontawesome-free/scss/fontawesome.scss';
 import '@fortawesome/fontawesome-free/scss/solid.scss';
 import './sass/main.sass';
@@ -25,5 +27,6 @@ Vue.use(require('vue-moment'), {
 Vue.use( VueCodemirror );
 
 new Vue({
-  render: h => h(App)
+  render: h => h(App),
+  store: store
 }).$mount('#app');
