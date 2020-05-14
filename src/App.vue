@@ -175,6 +175,7 @@
               v-b-tooltip="'Темная тема'"
               button-variant="light"
               :checked="darkMode"
+              v-if="!collapse"
               @change="darkModeChange"
               button
               class="flex-fill fixed-checkbox"
