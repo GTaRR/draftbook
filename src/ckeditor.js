@@ -32,6 +32,8 @@ import SourceView from './plugins/sourceview';
 
 import '@ckeditor/ckeditor5-build-classic/build/translations/ru';
 
+import '@/sass/ckeditor_overrides.sass'
+
 export default class ClassicEditor extends ClassicEditorBase {}
 
 ClassicEditor.builtinPlugins = [

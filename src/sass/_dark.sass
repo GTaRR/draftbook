@@ -1,12 +1,18 @@
 .dark
   .ck-editor
-    filter: invert(1) contrast(80%)
-  .ck.ck-editor__main>.ck-editor__editable.ck-focused
-    border-color: var(--gray-500) !important
+    color: var(--gray-800)
+  .ck-content blockquote
+    border-left-color: #383838
   .modal-content
     filter: invert(1) contrast(0.85)
     .btn
       filter: invert(1)
+  code
+    color: var(--primary)
+    background-color: #333
+.dark:not(.colored) code
+  background-color: #282828
+  filter: saturate(1.5) brightness(1.15)
 
 .dark-mode
   filter: invert(1) contrast(75%)

@@ -92,35 +92,57 @@ export default {
     customColor: s => s.customColor,
     theme: s => s.theme,
     themes: s => s.themes,
-    currentTheme: s => s.themes.filter(theme => theme.name === s.theme)
+    currentTheme: s => s.themes.filter(theme => theme.name === s.theme)[0]
   },
   actions: {
     setColor({commit, getters}, hue) {
       commit('setColor', hue);
       commit('setTheme', getters.theme);
     },
-    setTheme({commit}, name) {
-      commit('setTheme', name)
+    setTheme({commit, state, getters}, name) {
+      commit('setTheme', {name, getters})
+      localStorage.setItem('multiple_cke_theme', JSON.stringify(state));
     },
     setDarkMode({commit}, dark) {
       commit('setDarkMode', dark)
+    },
+    initTheme({commit}){
+      if (localStorage.getItem('multiple_cke_theme')) {
+        commit('initTheme');
+      }
     },
   },
   mutations: {
     setColor(state, hue) {
       state.color.hue = hue;
       state.customColor = true;
-      state.changeTheme(state.theme);
     },
-    setTheme(state, name) {
+    setTheme(state, {name, getters}) {
       state.theme = name;
-      const theme = state.themes.filter(theme => theme.name === name)[0];
+      const currentTheme = getters.currentTheme;
 
-      state.darkMode = theme.dark;
-      state.coloredMode = theme.colored;
+      state.darkMode = currentTheme.dark;
+      state.coloredMode = currentTheme.colored;
     },
     setDarkMode(state, dark) {
       state.darkMode = dark;
     },
+    initTheme(state) {
+      const {
+        color,
+        darkMode,
+        coloredMode,
+        customColor,
+        theme,
+        themes
+      } = JSON.parse(localStorage.getItem('multiple_cke_theme'));
+
+      if(color) state.color = color;
+      if(darkMode) state.darkMode = darkMode;
+      if(coloredMode) state.coloredMode = coloredMode;
+      if(customColor) state.customColor = customColor;
+      if(theme) state.theme = theme;
+      if(themes) state.themes = themes;
+    }
   }
 }

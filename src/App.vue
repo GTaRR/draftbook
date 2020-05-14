@@ -115,7 +115,9 @@
               <h4>Тема</h4>
               <hr>
               <theme-list @changeTheme="changeTheme" />
-
+              <hr>
+              <h4>Цвет</h4>
+              <hr>
               <color-picker v-bind="color" @input="changeColor"></color-picker>
 
               <template v-slot:modal-footer="{ ok }">
@@ -373,8 +375,7 @@ export default {
       }
     });
 
-    // Применение темы
-    this.changeTheme(this.theme);
+    this.initTheme();
   },
   watch: {
     darkMode(darkmode) {
@@ -490,6 +491,10 @@ export default {
       }
 
       this.$store.dispatch('setTheme', name);
+    },
+    initTheme(){
+      this.$store.dispatch('initTheme');
+      this.changeTheme(this.theme);
     },
 
     isModalOk(bvEvent, modalId) {

@@ -4,7 +4,7 @@
   border-color: var(--light)
   .colored &
     border-color: transparent
-    &:active, &.active, &:focus
+    &:active, &.active, &:focus, &.focus
       border-color: transparent !important
     &:hover
       border-color: transparent
@@ -13,7 +13,10 @@
     background-color: var(--light-hover)
     border-color: var(--light-hover)
   &:focus, &.focus
+    color: var(--link)
     background-color: var(--light)
+    border-color: var(--light)
+    box-shadow: 0 0 0 4px var(--light-active)
 
 .btn-primary
   color: var(--white)
