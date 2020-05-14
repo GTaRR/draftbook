@@ -9,7 +9,7 @@ export default {
     darkMode: false,
     coloredMode: false,
     customColor: false,
-    theme: 'dark',
+    theme: 'default',
     themes: [
       {
         name: 'default',
