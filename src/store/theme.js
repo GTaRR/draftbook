@@ -1,5 +1,5 @@
 export default {
-  store: {
+  state: {
     color: {
       hue: 163,
       saturation: 38,
@@ -9,7 +9,7 @@ export default {
     darkMode: false,
     coloredMode: false,
     customColor: false,
-    theme: 'default',
+    theme: 'dark',
     themes: [
       {
         name: 'default',
@@ -91,29 +91,36 @@ export default {
     coloredMode: s => s.coloredMode,
     customColor: s => s.customColor,
     theme: s => s.theme,
-    themes: s => s.themes
+    themes: s => s.themes,
+    currentTheme: s => s.themes.filter(theme => theme.name === s.theme)
   },
   actions: {
-    changeColor({commit, getters}, hue) {
-      commit('changeColor', hue);
-      commit('changeTheme', getters.theme);
+    setColor({commit, getters}, hue) {
+      commit('setColor', hue);
+      commit('setTheme', getters.theme);
     },
-    changeTheme({commit}, name) {
-      commit('changeTheme', name)
-    }
+    setTheme({commit}, name) {
+      commit('setTheme', name)
+    },
+    setDarkMode({commit}, dark) {
+      commit('setDarkMode', dark)
+    },
   },
   mutations: {
-    changeColor(state, hue) {
+    setColor(state, hue) {
       state.color.hue = hue;
       state.customColor = true;
       state.changeTheme(state.theme);
     },
-    changeTheme(state, name) {
+    setTheme(state, name) {
       state.theme = name;
-      const theme = state.themes.filter(theme => theme.name === name);
+      const theme = state.themes.filter(theme => theme.name === name)[0];
 
       state.darkMode = theme.dark;
       state.coloredMode = theme.colored;
-    }
+    },
+    setDarkMode(state, dark) {
+      state.darkMode = dark;
+    },
   }
 }

@@ -101,7 +101,7 @@
                 </b-form-file>
                 <b-button
                     variant="light"
-                    @click="darkMode = !darkMode"
+                    @click="$store.dispatch('setDarkMode', !darkMode)"
                     size="sm"
                 >
                   <i class="fa fas fa-paint-brush"></i>
@@ -114,57 +114,15 @@
             <b-modal id="settingsModal" size="xl" centered title="Настройки">
               <h4>Тема</h4>
               <hr>
-              <div class="theme-list">
-                <div
-                  class="theme-item default"
-                  @click="changeTheme('default')"
-                  :class="{active: theme === 'default'}"
-                >
-                  <div class="theme-sidebar">
-                    <div class="theme-sidebar__top"></div>
-                    <div class="theme-sidebar__bottom"></div>
-                  </div>
-                  <div class="theme-body"></div>
-                </div>
-
-                <div
-                  class="theme-item colored"
-                  @click="changeTheme('colored')"
-                  :class="{active: theme === 'colored'}"
-                >
-                  <div class="theme-sidebar">
-                    <div class="theme-sidebar__top"></div>
-                    <div class="theme-sidebar__bottom"></div>
-                  </div>
-                  <div class="theme-body"></div>
-                </div>
-
-                <div
-                  class="theme-item dark"
-                  @click="changeTheme('dark')"
-                  :class="{active: theme === 'dark'}"
-                >
-                  <div class="theme-sidebar">
-                    <div class="theme-sidebar__top"></div>
-                    <div class="theme-sidebar__bottom"></div>
-                  </div>
-                  <div class="theme-body"></div>
-                </div>
-
-                <div
-                  class="theme-item colored dark"
-                  @click="changeTheme('colored-dark')"
-                  :class="{active: theme === 'colored-dark'}"
-                >
-                  <div class="theme-sidebar">
-                    <div class="theme-sidebar__top"></div>
-                    <div class="theme-sidebar__bottom"></div>
-                  </div>
-                  <div class="theme-body"></div>
-                </div>
-              </div>
+              <theme-list @changeTheme="changeTheme" />
 
               <color-picker v-bind="color" @input="changeColor"></color-picker>
+
+              <template v-slot:modal-footer="{ ok }">
+                <b-button variant="primary" @click="ok()">
+                  OK
+                </b-button>
+              </template>
             </b-modal>
 
             <b-modal id="sourceViewer" size="xl" centered title="Исходный код">
@@ -214,7 +172,7 @@
               title="Темная тема"
               v-b-tooltip="'Темная тема'"
               button-variant="light"
-              v-model="darkMode"
+              :checked="darkMode"
               @change="darkModeChange"
               button
               class="flex-fill fixed-checkbox"
@@ -269,13 +227,16 @@
 </template>
 
 <script>
-import ClassicEditor from './ckeditor';
 import Beautify from 'js-beautify';
 import ColorPicker from '@radial-color-picker/vue-color-picker';
 
+import ClassicEditor from './ckeditor';
+import ThemeList from './components/ThemeList';
+import { mapGetters } from 'vuex';
+
 export default {
   name: 'app',
-  components: { ColorPicker },
+  components: { ColorPicker, ThemeList },
   data(){
     return {
       classicEditor: ClassicEditor,
@@ -337,93 +298,18 @@ export default {
         lineWrapping: false,
         autofocus: true,
       },
-
-      // theme
-      color: {
-        hue: 163,
-        saturation: 38,
-        luminosity: 62,
-        alpha: 1
-      },
-      darkMode: false,
-      coloredMode: false,
-      customColor: false,
-      theme: 'default',
-      themes: [
-        {
-          name: 'default',
-          saturation: 38,
-          luminosity: 62,
-          background: '#fff',
-          sidebarBackground: '#fff',
-          light: '#f8f9fa',
-          lightHover: '#eee',
-          lightActive: '#eee',
-          gray: {
-            400: "#ced4da",
-            500: "#aaa",
-            700: "#5a5a5a",
-            800: "#343a40",
-          },
-          dark: false,
-          colored: false,
-        },
-        {
-          name: 'dark',
-          saturation: 25,
-          luminosity: 48,
-          background: '#202020',
-          sidebarBackground: '#202020',
-          light: '#252424',
-          lightHover: '#2d2d2d',
-          lightActive: '#1b1b1b',
-          gray: {
-            400: "#45403c",
-            500: "#606060",
-            700: "#ccc",
-            800: "#ccc",
-          },
-          dark: true,
-          colored: false,
-        },
-        {
-          name: 'colored',
-          saturation: 36,
-          luminosity: 62,
-          background: '#fff',
-          sidebarBackground: '#fff',
-          light: '#f8f9fa',
-          lightHover: '#eee',
-          lightActive: '#eee',
-          gray: {
-            400: "#ced4da",
-            500: "#aaa",
-            700: "#5a5a5a",
-            800: "#343a40",
-          },
-          dark: false,
-          colored: true,
-        },
-        {
-          name: 'colored-dark',
-          saturation: 32,
-          luminosity: 54,
-          background: '#202020',
-          sidebarBackground: '#202020',
-          light: '#252424',
-          lightHover: '#2d2d2d',
-          lightActive: '#393334',
-          gray: {
-            400: "#45403c",
-            500: "#606060",
-            700: "#ccc",
-            800: "#ccc",
-          },
-          dark: true,
-          colored: true,
-        },
-      ]
     }
+  },
+  computed: {
+    // theme
+    ...mapGetters([
+      'color',
+      'darkMode',
+      'coloredMode',
+      'customColor',
+      'theme',
+      'themes'
+    ])
   },
   created: function(){
     this.tabCounter = Object.keys(this.editors).length;
@@ -446,16 +332,6 @@ export default {
         }
       }
     });
-  },
-  watch: {
-    darkMode(darkmode) {
-      if (darkmode) document.body.classList.add('dark');
-      else document.body.classList.remove('dark');
-    },
-    coloredMode(colored) {
-      if (colored) document.body.classList.add('colored');
-      else document.body.classList.remove('colored');
-    }
   },
   mounted(){
     let that = this;
@@ -500,9 +376,19 @@ export default {
     // Применение темы
     this.changeTheme(this.theme);
   },
+  watch: {
+    darkMode(darkmode) {
+      if (darkmode) document.body.classList.add('dark');
+      else document.body.classList.remove('dark');
+    },
+    coloredMode(colored) {
+      if (colored) document.body.classList.add('colored');
+      else document.body.classList.remove('colored');
+    }
+  },
   methods: {
     darkModeChange(dark) {
-      this.darkMode = dark;
+      this.$store.dispatch('setDarkMode', dark);
       let colored = this.coloredMode;
 
       if (colored && dark) {
@@ -526,8 +412,7 @@ export default {
       this.$bvModal.show('settingsModal');
     },
     changeColor(hue) {
-      this.color.hue = hue;
-      this.customColor = true;
+      this.$store.commit('setColor', hue);
       this.changeTheme(this.theme);
     },
     changeTheme(name) {
@@ -604,9 +489,7 @@ export default {
         document.documentElement.style.setProperty(color[0], color[1]);
       }
 
-      this.theme = name;
-      this.darkMode = dark;
-      this.coloredMode = colored;
+      this.$store.dispatch('setTheme', name);
     },
 
     isModalOk(bvEvent, modalId) {

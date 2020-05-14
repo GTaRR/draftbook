@@ -11,7 +11,7 @@ import 'codemirror/mode/xml/xml.js'
 import moment from 'moment';
 require('moment/locale/ru');
 
-import store from './store'
+import {store} from './store'
 
 import '@fortawesome/fontawesome-free/scss/fontawesome.scss';
 import '@fortawesome/fontawesome-free/scss/solid.scss';
