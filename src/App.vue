@@ -5,7 +5,8 @@
       :class="{dark: darkMode, colored: coloredMode}"
     >
       <b-tabs
-        v-model="tabIndex"
+        :value="tabIndex"
+        @input="clickTab"
         pills
         card
         vertical
@@ -23,7 +24,7 @@
           v-for="(editor, key) in editors"
           :key="editor.id"
           title-link-class="d-flex justify-content-between"
-          @click="clickTab(editor.id)"
+          @click="$store.commit('setActiveEditor', editor.id)"
         >
 
           <template slot="title">
@@ -46,17 +47,17 @@
 
             <b-form-input
               ref="titleInput"
-              v-model="editor.name"
+              :value="editor.name"
               class="mb-2"
               placeholder="Имя заметки"
-              @input="changeData"
+              @input="changeEditorName"
             />
 
             <ckeditor
               :editor="classicEditor"
-              v-model="editor.data"
+              :value="editor.data"
               :config="{}"
-              @input="changeData"
+              @input="changeEditorData"
               @focus="inFocus = true"
               @blur="inFocus = false"
             />
@@ -111,7 +112,7 @@
         <template slot="tabs-end">
 
           <b-nav-item
-            @click.prevent="newTab"
+            @click.prevent="$store.dispatch('newTab')"
             class="text-center"
             href="#"
           >
@@ -208,33 +209,6 @@ export default {
   data(){
     return {
       classicEditor: ClassicEditor,
-      editors: [
-        {
-          id: 0,
-          name: 'Первая заметка',
-          data: `
-            <h2>Черновик для заметок!</h2>
-            <p>Это просто черновик для заметок, который автоматически запоминает данные в <code>LocalStorage</code> браузера, чтобы данные не потерялись ни при закрытии вкладки, ни при закрытии браузера.</p>
-            <p>Удобно использовать для написания оценок, инструкций и прочего без создания документа, использования отдельного редактора.</p>
-            <p>Запоминаются все вкладки. При очистке кеша всего браузера стираются и эти заметки из <code>LocalStorage</code>.</p>
-            <blockquote>
-                <p><strong>Как создать новую вкладку?&nbsp;</strong></p>
-                <p>Нажмите <code>+</code> в боковой панели.</p>
-            </blockquote>
-            <blockquote>
-                <p><strong>Как переименовать вкладку?&nbsp;</strong></p>
-                <p>Заголовок заметки сверху является полем ввода.</p>
-            </blockquote>
-          `,
-          time: {
-              create: this.$moment(),
-              open: 0,
-              focus: 0,
-          }
-        }
-      ],
-      tabIndex: 0,
-      activeEditor: 0,
 
       // options
       fixedSidebar: true,
@@ -267,8 +241,13 @@ export default {
     }
   },
   computed: {
-    // theme
     ...mapGetters([
+      // editors
+      'editors',
+      'tabIndex',
+      'activeEditor',
+
+      // theme
       'color',
       'darkMode',
       'coloredMode',
@@ -278,18 +257,7 @@ export default {
     ])
   },
   created: function(){
-    if(localStorage.getItem('multiple_cke_data')) {
-      this.editors = JSON.parse(localStorage.getItem('multiple_cke_data'));
-    }
-    this.editors.map(item => {
-      if(typeof item.time === 'undefined') {
-        item.time = {
-          create: this.$moment(),
-          open: 0,
-          focus: 0
-        }
-      }
-    });
+    this.$store.commit('loadEditors');
   },
   mounted(){
     let that = this;
@@ -308,7 +276,10 @@ export default {
 
     this.$root.$on('bv::modal::hide', (bvEvent, modalId) => {
       if (this.isModalOk(bvEvent, modalId)) {
-        this.editors[this.tabIndex].data = this.sourceCodeEditorData;
+        this.$store.commit(
+          'setSourceCodeEditorData',
+          this.sourceCodeEditorData
+        );
       }
     });
 
@@ -322,7 +293,7 @@ export default {
         reader.readAsText(file);
 
         reader.onload = function() {
-          that.editors = JSON.parse(reader.result);
+          that.$store('setEditors', JSON.parse(reader.result));
         };
 
         reader.onerror = function() {
@@ -519,8 +490,14 @@ export default {
     },
     changeData() {
       if (!document.hidden) {
-        localStorage.setItem('multiple_cke_data', JSON.stringify(this.editors));
+        this.$store.dispatch('setLocalStorageEditors');
       }
+    },
+    changeEditorData(value) {
+      this.$store.commit('setEditorProperty', {property: 'data', value});
+    },
+    changeEditorName(value) {
+      this.$store.commit('setEditorProperty', {property: 'name', value});
     },
 
     focusTitle() {
@@ -543,7 +520,7 @@ export default {
 
         if (parseInt(editor) === x) {
           this.editors.splice(parseInt(editor), 1);
-          localStorage.setItem('multiple_cke_data', JSON.stringify(this.editors));
+          this.$store.dispatch('setLocalStorageEditors');
         }
       }
     },
@@ -558,10 +535,10 @@ export default {
           focus: 0
         }
       });
-      localStorage.setItem('multiple_cke_data', JSON.stringify(this.editors));
+      this.$store.dispatch('setLocalStorageEditors');
     },
     clickTab(tabId) {
-      this.activeEditor = tabId;
+      this.$store.commit('setTabIndex', tabId);
     },
 
     // timers
