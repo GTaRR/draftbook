@@ -1,124 +1,82 @@
 <template>
   <div id="app">
-    <b-card no-body :class="{dark: darkMode, colored: coloredMode}">
+    <b-card
+      no-body
+      :class="{dark: darkMode, colored: coloredMode}"
+    >
       <b-tabs
-          v-model="tabIndex"
-          pills
-          card
-          vertical
-          lazy
-          ref="tabsWrapper"
-          :nav-class="{'fixed-nav':fixedSidebar}"
-          nav-wrapper-class="nav-wrapper"
+        v-model="tabIndex"
+        pills
+        card
+        vertical
+        lazy
+        ref="tabsWrapper"
+        :nav-class="{'fixed-nav':fixedSidebar}"
+        nav-wrapper-class="nav-wrapper"
       >
 
         <template slot="tabs-start">
-          <div class="main-header py-3 px-3 d-flex align-items-center">
-            <div class="main-header__overlay"></div>
-            <button class="mr-3 btn btn-primary"
-                    @click="toggleSidebar"
-            ><i class="fas fa-bars"></i></button>
-            <span class="logo-title">Draftbook</span>
-          </div>
+          <app-header @toggleSidebar="collapse = !collapse" />
         </template>
 
-        <b-tab v-for="(editor, key) in editors"
-               :key="editor.id"
-               title-link-class="d-flex justify-content-between"
-               @click="clickTab(editor.id)"
+        <b-tab
+          v-for="(editor, key) in editors"
+          :key="editor.id"
+          title-link-class="d-flex justify-content-between"
+          @click="clickTab(editor.id)"
         >
 
           <template slot="title">
-            <span class="tab-title"
-                  @dblclick="focusTitle"
-                  v-b-tooltip="editor.name"
+            <span
+              class="tab-title"
+              @dblclick="focusTitle"
+              v-b-tooltip="editor.name"
             >{{ editor.name }}</span>
-            <span v-if="!collapse"
-                  class="btn btn-sm"
-                  :class="(tabIndex === key) ? 'btn-primary' : 'btn-light'"
-                  @click="closeTab(key)"
-            ><i class="fas fa-times"></i></span>
+            <span
+              v-if="!collapse"
+              class="btn btn-sm"
+              :class="(tabIndex === key) ? 'btn-primary' : 'btn-light'"
+              @click="closeTab(key)"
+            >
+              <i class="fas fa-times"></i>
+            </span>
           </template>
 
           <b-card-text>
 
-            <b-form-input ref="titleInput"
-                          v-model="editor.name"
-                          class="mb-2"
-                          placeholder="Имя заметки"
-                          @input="changeData"
-            ></b-form-input>
+            <b-form-input
+              ref="titleInput"
+              v-model="editor.name"
+              class="mb-2"
+              placeholder="Имя заметки"
+              @input="changeData"
+            />
 
-            <ckeditor :editor="classicEditor"
-                      v-model="editor.data"
-                      :config="editorConfig"
-                      @input="changeData"
-                      @focus="onEditorFocus"
-                      @blur="onEditorBlur"
-            ></ckeditor>
+            <ckeditor
+              :editor="classicEditor"
+              v-model="editor.data"
+              :config="{}"
+              @input="changeData"
+              @focus="inFocus = true"
+              @blur="inFocus = false"
+            />
 
-            <div class="mt-3 d-flex align-items-center flex-wrap">
-              <span class="mr-2">
-                <span class="text-dark mr-2">Заметка создана:</span>
-                <span class="text-primary mr-2"
-                      v-b-tooltip.hover
-                      :title="editor.time.create | moment('Do MMMM YYYY, H:mm:ss')"
-                >
-                  {{ currentTabTimeDiff }}
-                </span>
-              </span>
-              <span class="mr-2">
-                <span class="text-dark mr-2">Заметка открыта:</span>
-                <span class="text-primary mr-2">{{ currentTabTimeWhileOpen }}</span>
-              </span>
-              <span class="mr-2">
-                <span class="text-dark mr-2">Поле в фокусе:</span>
-                <span class="text-primary">{{ currentTabTimeWhileFocus }}</span>
-              </span>
-
-              <div
-                  v-if="!collapse && 0"
-                  class="import-wrapper ml-auto d-flex"
-              >
-                <b-button
-                    variant="light"
-                    @click="downloadJSON"
-                    size="sm"
-                >
-                  <i class="fas fa-download"></i>
-                  <span>Экспорт</span>
-                </b-button>
-                <b-form-file
-                    accept="application/json"
-                    class="btn btn-light"
-                    placeholder=""
-                    drop-placeholder=""
-                    v-model="jsonFile"
-                    size="sm"
-                >
-                  <i class="fas fa-upload"></i>
-                  <span>Импорт</span>
-                </b-form-file>
-                <b-button
-                    variant="light"
-                    @click="$store.dispatch('setDarkMode', !darkMode)"
-                    size="sm"
-                >
-                  <i class="fa fas fa-paint-brush"></i>
-                  <span>Тема</span>
-                </b-button>
-              </div>
-
-            </div>
+            <app-timers
+              :editor="editor"
+              :currentTabTimeDiff="currentTabTimeDiff"
+              :currentTabTimeWhileOpen="currentTabTimeWhileOpen"
+              :currentTabTimeWhileFocus="currentTabTimeWhileFocus"
+            />
 
             <b-modal id="settingsModal" size="xl" centered title="Настройки">
               <h4>Тема</h4>
               <hr>
-              <theme-list @changeTheme="changeTheme" />
+              <theme-list @changeTheme="setTheme" />
+
               <hr>
               <h4>Цвет</h4>
               <hr>
-              <color-picker v-bind="color" @input="changeColor"></color-picker>
+              <color-picker v-bind="color" @input="setColor"></color-picker>
 
               <template v-slot:modal-footer="{ ok }">
                 <b-button variant="primary" @click="ok()">
@@ -129,11 +87,11 @@
 
             <b-modal id="sourceViewer" size="xl" centered title="Исходный код">
               <codemirror
-                  ref="cmEditor"
-                  :value="sourceCodeEditorDataBeautify"
-                  :options="cmOptions"
-                  @ready="onCmReady"
-                  @input="onCmCodeChange"
+                ref="cmEditor"
+                :value="sourceCodeEditorDataBeautify"
+                :options="cmOptions"
+                @ready="onCmReady"
+                @input="onCmCodeChange"
               />
 
               <template v-slot:modal-footer="{ ok }">
@@ -160,16 +118,16 @@
             <i class="fas fa-plus"></i>
           </b-nav-item>
 
-
           <b-button-group class="mt-auto top-border">
             <b-button
               v-b-tooltip="'Настройки'"
               variant="light"
               v-if="!collapse"
-              @click="openSettings"
+              @click="$bvModal.show('settingsModal')"
             >
               <i class="fas fa-cog"></i>
             </b-button>
+
             <b-form-checkbox
               title="Темная тема"
               v-b-tooltip="'Темная тема'"
@@ -182,35 +140,39 @@
             >
               <i class="fas fa-moon"></i>
             </b-form-checkbox>
+
             <b-button
-                v-b-tooltip="'Экспорт в JSON'"
-                variant="light"
-                v-if="!collapse && 0"
-                @click="downloadJSON"
+              v-b-tooltip="'Экспорт в JSON'"
+              variant="light"
+              v-if="!collapse && 0"
+              @click="downloadJSON"
             >
               <i class="fas fa-download"></i>
             </b-button>
+
             <b-button
-                v-b-tooltip="'Импорт из JSON'"
-                variant="light"
-                v-if="!collapse && 0"
-                @click="uploadJSON"
+              v-b-tooltip="'Импорт из JSON'"
+              variant="light"
+              v-if="!collapse && 0"
+              @click="uploadJSON"
             >
               <i class="fas fa-upload"></i>
             </b-button>
+
             <input
-                class="d-none"
-                type="file"
-                accept="application/json"
-                ref="fileInput"
-            >
+              class="d-none"
+              type="file"
+              accept="application/json"
+              ref="fileInput"
+            />
+
             <b-form-checkbox
-                title="Фиксирование сайдбара"
-                v-b-tooltip="'Фиксирование сайдбара'"
-                button-variant="light"
-                v-model="fixedSidebar"
-                button
-                class="flex-fill fixed-checkbox"
+              title="Фиксирование сайдбара"
+              v-b-tooltip="'Фиксирование сайдбара'"
+              button-variant="light"
+              v-model="fixedSidebar"
+              button
+              class="flex-fill fixed-checkbox"
             >
               <i class="fas fa-thumbtack"></i>
             </b-form-checkbox>
@@ -232,18 +194,20 @@
 <script>
 import Beautify from 'js-beautify';
 import ColorPicker from '@radial-color-picker/vue-color-picker';
+import { mapGetters } from 'vuex';
 
 import ClassicEditor from './ckeditor';
+
 import ThemeList from './components/ThemeList';
-import { mapGetters } from 'vuex';
+import AppHeader from './components/AppHeader';
+import AppTimers from './components/AppTimers';
 
 export default {
   name: 'app',
-  components: { ColorPicker, ThemeList },
+  components: { ColorPicker, ThemeList, AppHeader, AppTimers },
   data(){
     return {
       classicEditor: ClassicEditor,
-      editorConfig: {},
       editors: [
         {
           id: 0,
@@ -270,7 +234,6 @@ export default {
         }
       ],
       tabIndex: 0,
-      tabCounter: 1,
       activeEditor: 0,
 
       // options
@@ -280,7 +243,7 @@ export default {
       // import/export data
       jsonFile: null,
 
-      // time
+      // timers
       interval: null,
       inFocus: false,
       currentTabTimeDiff: '',
@@ -315,16 +278,8 @@ export default {
     ])
   },
   created: function(){
-    this.tabCounter = Object.keys(this.editors).length;
     if(localStorage.getItem('multiple_cke_data')) {
       this.editors = JSON.parse(localStorage.getItem('multiple_cke_data'));
-      this.tabCounter = 0;
-      for(let editor of this.editors){
-        if(editor.id > this.tabCounter){
-          this.tabCounter = editor.id;
-        }
-      }
-      this.tabCounter++;
     }
     this.editors.map(item => {
       if(typeof item.time === 'undefined') {
@@ -389,35 +344,33 @@ export default {
     }
   },
   methods: {
+    // theme
     darkModeChange(dark) {
       this.$store.dispatch('setDarkMode', dark);
       let colored = this.coloredMode;
 
       if (colored && dark) {
-        this.changeTheme('colored-dark');
+        this.setTheme('colored-dark');
       }
       if (!colored && dark) {
-        this.changeTheme('dark');
+        this.setTheme('dark');
       }
       if (!colored && !dark) {
-        this.changeTheme('default');
+        this.setTheme('default');
       }
       if (colored && !dark) {
-        this.changeTheme('colored');
+        this.setTheme('colored');
       }
 
       if (this.customColor) {
-        this.changeColor(this.color.hue);
+        this.setColor(this.color.hue);
       }
     },
-    openSettings() {
-      this.$bvModal.show('settingsModal');
-    },
-    changeColor(hue) {
+    setColor(hue) {
       this.$store.commit('setColor', hue);
-      this.changeTheme(this.theme);
+      this.setTheme(this.theme);
     },
-    changeTheme(name) {
+    setTheme(name) {
       const theme = this.themes.filter(theme => theme.name === name)[0];
       if (!theme) return;
 
@@ -436,42 +389,41 @@ export default {
 
       let h = this.color.hue;
 
-      // Поправки
-      let hoverIncrement =                (dark) ? -7.5 : 7.5;
-      let activeIncrement =               (dark) ? 2.5  : 10;
-      let lightLuminosityDecrement =      (dark) ? 15   : 5;
-      let backgroundLuminosityDecrement = (dark) ? 35   : 0;
-      let backgroundOpacity =             (dark) ? 0.75 : 0.15;
-      let lightHoverDecrement =           (dark) ? 2.5  : 15;
-      let lightActiveDecrement =          (dark) ? 5   : 20;
-      let lightOpacity =                  (dark) ? 1    : .25;
+      let HI =  (dark) ? -7.5 : 7.5;  // hover increment
+      let AI =  (dark) ? 2.5  : 10;   // active increment
+      let LLD = (dark) ? 15   : 5;    // background luminosity decrement
+      let BLD = (dark) ? 35   : 0;    // background luminosity decrement
+      let BO =  (dark) ? 0.75 : 0.15; // background opacity
+      let LHD = (dark) ? 2.5  : 15;   // light hover decrement
+      let LAD = (dark) ? 5    : 20;   // light active decrement
+      let LO =  (dark) ? 1    : .25;  // light opacity decrement
 
-      const mainColor = `hsl(${h},${s}%,${l}%)`;
-      const hoverMainColor = `hsl(${h},${s}%,${l-hoverIncrement}%)`;
-      const activeMainColor = `hsl(${h},${s}%,${l-activeIncrement}%)`;
-      const lightMainColor = `hsla(${h},${s}%,${l}%, 0.5)`;
-      let link = mainColor;
-      let linkHover = activeMainColor;
+      let primary       = `hsl(${h}, ${s}%, ${l}%)`;
+      let primaryHover  = `hsl(${h}, ${s}%, ${l-HI}%)`;
+      let primaryActive = `hsl(${h}, ${s}%, ${l-AI}%)`;
+      let primaryLight  = `hsla(${h}, ${s}%, ${l}%, 0.5)`;
+      let link          = primary;
+      let linkHover     = primaryActive;
 
       if (colored) {
-        light = `hsla(${h},30%,${l-lightLuminosityDecrement}%, ${lightOpacity})`;
-        lightHover = `hsla(${h},30%,${l-lightLuminosityDecrement-lightHoverDecrement}%, ${lightOpacity})`;
-        lightActive = `hsla(${h},40%,${l-lightLuminosityDecrement-lightActiveDecrement}%, ${lightOpacity})`;
-        sidebarBackground = `hsla(${h},${s}%,${l-backgroundLuminosityDecrement}%, ${backgroundOpacity})`;
+        light =             `hsla(${h}, 30%, ${l - LLD}%, ${LO})`;
+        lightHover =        `hsla(${h}, 30%, ${l - LLD - LHD}%, ${LO})`;
+        lightActive =       `hsla(${h}, 40%, ${l - LLD - LAD}%, ${LO})`;
+        sidebarBackground = `hsla(${h}, ${s}%, ${l - BLD}%, ${BO})`;
 
         if (dark) {
           link = linkHover = '#fff';
-          sidebarBackground = `hsla(${h},10%,15%, ${backgroundOpacity})`;
+          sidebarBackground = `hsla(${h}, 10%, 15%, ${BO})`;
         } else {
-          link = linkHover = `hsl(${h},${s}%, 30%)`;
+          link = linkHover = `hsl(${h}, ${s}%, 30%)`;
         }
       }
 
-      const colors = [
-        ['--primary', mainColor],
-        ['--primary-hover', hoverMainColor],
-        ['--primary-active', activeMainColor],
-        ['--primary-light', lightMainColor],
+      const colorsMap = [
+        ['--primary', primary],
+        ['--primary-hover', primaryHover],
+        ['--primary-active', primaryActive],
+        ['--primary-light', primaryLight],
         ['--link', link],
         ['--link-hover', linkHover],
         ['--background', background],
@@ -485,19 +437,23 @@ export default {
         ['--gray-800', gray["800"]],
       ];
 
-      for (let color of colors) {
-        if (!color[0] || !color[1]) return;
+      for (let color of colorsMap) {
+        let cssVar = color[0];
+        let value = color[1];
 
-        document.documentElement.style.setProperty(color[0], color[1]);
+        if (!cssVar || !value) return;
+
+        document.documentElement.style.setProperty(cssVar, value);
       }
 
       this.$store.dispatch('setTheme', name);
     },
     initTheme(){
       this.$store.dispatch('initTheme');
-      this.changeTheme(this.theme);
+      this.setTheme(this.theme);
     },
 
+    // source code editor
     isModalOk(bvEvent, modalId) {
       return modalId === 'sourceViewer'
         && bvEvent.trigger === 'ok'
@@ -541,7 +497,6 @@ export default {
           console.error('Произошла ошибка при копировании в буфер', err);
         });
     },
-
     onCmCodeChange(data) {
       this.sourceCodeEditorData = data;
     },
@@ -580,10 +535,8 @@ export default {
         classList.remove('shake');
       }, 1000);
     },
-    toggleSidebar() {
-      this.collapse = !this.collapse;
-      this.$refs.tabsWrapper.$el.classList.toggle('collapse-tabs');
-    },
+
+    // tabs
     closeTab(x) {
       for (let editor in this.editors) {
         if(!({}).hasOwnProperty.call(this.editors, editor)) continue;
@@ -596,7 +549,7 @@ export default {
     },
     newTab() {
       this.editors.push({
-        id: this.tabCounter,
+        id: Date.now(),
         name: 'Новая заметка',
         data: 'Текст заметки',
         time: {
@@ -605,13 +558,13 @@ export default {
           focus: 0
         }
       });
-      this.tabCounter++;
       localStorage.setItem('multiple_cke_data', JSON.stringify(this.editors));
     },
     clickTab(tabId) {
       this.activeEditor = tabId;
     },
 
+    // timers
     tick() {
       this.editors[this.tabIndex].time.open += 1000;
       if(this.inFocus) {
@@ -622,14 +575,6 @@ export default {
       this.setCurrentTabTimeFromCreate();
       this.changeData();
     },
-
-    onEditorFocus() {
-      this.inFocus = true;
-    },
-    onEditorBlur() {
-      this.inFocus = false;
-    },
-
     setCurrentTabTimeFromCreate() {
       let diffTime = this.$moment().diff(this.editors[this.tabIndex].time.create);
       let duration = this.$moment.duration(diffTime);
