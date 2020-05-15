@@ -598,7 +598,7 @@ export default {
       this.editors.push({
         id: this.tabCounter,
         name: 'Новая заметка',
-        data: 'Текст заметки ' + this.tabCounter,
+        data: 'Текст заметки',
         time: {
           create: this.$moment(),
           open: 0,
