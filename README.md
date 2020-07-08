@@ -1,4 +1,4 @@
-# Draft 
+# 📄 Draft 
 ## Черновик для заметок!
 
 ![Draft](src/assets/draft_screen.png)
