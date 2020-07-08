@@ -260,7 +260,7 @@ export default {
     this.$store.commit('loadEditors');
   },
   mounted(){
-    let that = this;
+    let vm = this;
 
     this.interval = setInterval(() => {
       this.tick();
@@ -275,7 +275,7 @@ export default {
     });
 
     this.$root.$on('bv::modal::hide', (bvEvent, modalId) => {
-      if (this.isModalOk(bvEvent, modalId)) {
+      if (this.isSourceViewerOk(bvEvent, modalId)) {
         this.$store.commit(
           'setSourceCodeEditorData',
           this.sourceCodeEditorData
@@ -285,21 +285,20 @@ export default {
 
     // импорт JSON
     this.$refs.fileInput.addEventListener('change', function () {
-      if (this.files && this.files.length > 0) {
-        let file = this.files[0];
+      if (!(this.files && this.files.length > 0)) return;
 
-        let reader = new FileReader();
+      const file = this.files[0];
+      const reader = new FileReader();
 
-        reader.readAsText(file);
+      reader.readAsText(file);
 
-        reader.onload = function() {
-          that.$store('setEditors', JSON.parse(reader.result));
-        };
+      reader.onload = function() {
+        vm.$store.commit('setEditors', JSON.parse(reader.result));
+      };
 
-        reader.onerror = function() {
-          console.log(reader.error);
-        };
-      }
+      reader.onerror = function() {
+        console.log(reader.error);
+      };
     });
 
     this.initTheme();
@@ -425,7 +424,7 @@ export default {
     },
 
     // source code editor
-    isModalOk(bvEvent, modalId) {
+    isSourceViewerOk(bvEvent, modalId) {
       return modalId === 'sourceViewer'
         && bvEvent.trigger === 'ok'
         && this.sourceCodeEditorData;
@@ -471,9 +470,7 @@ export default {
     onCmCodeChange(data) {
       this.sourceCodeEditorData = data;
     },
-    onCmReady() {
-
-    },
+    onCmReady() {},
 
     downloadJSON() {
       let blob = new Blob([JSON.stringify(this.editors)], {type : 'application/json'});
@@ -485,9 +482,7 @@ export default {
     uploadJSON() {
       this.$refs.fileInput.click();
     },
-    loadFile(input) {
-      console.log(input);
-    },
+
     changeData() {
       if (!document.hidden) {
         this.$store.dispatch('setLocalStorageEditors');
@@ -544,35 +539,41 @@ export default {
     // timers
     tick() {
       this.editors[this.tabIndex].time.open += 1000;
-      if(this.inFocus) {
+      if (this.inFocus) {
         this.editors[this.tabIndex].time.focus += 1000;
       }
-      this.setCurrentTabTimeWhileFocus();
-      this.setCurrentTabTimeWhileOpen();
+
       this.setCurrentTabTimeFromCreate();
+      this.setCurrentTabTimeWhileOpen();
+      this.setCurrentTabTimeWhileFocus();
+
       this.changeData();
     },
     setCurrentTabTimeFromCreate() {
-      let diffTime = this.$moment().diff(this.editors[this.tabIndex].time.create);
-      let duration = this.$moment.duration(diffTime);
-      let hrs = '0' + duration.hours(),
-          mins = '0' + duration.minutes(),
-          secs = '0' + duration.seconds();
-      this.currentTabTimeDiff = hrs.slice(-2) + ':' + mins.slice(-2) + ':' + secs.slice(-2) + ' назад';
+      const diffTime = this.$moment().diff(this.editors[this.tabIndex].time.create);
+      const duration = this.$moment.duration(diffTime);
+      const {hours, minutes, seconds} = this.getFormattedTimes(duration);
+      this.currentTabTimeDiff = `${hours}:${minutes}:${seconds} назад`;
     },
     setCurrentTabTimeWhileOpen() {
-      let duration = this.$moment.duration(this.editors[this.tabIndex].time.open);
-      let hrs = '0' + duration.hours(),
-          mins = '0' + duration.minutes(),
-          secs = '0' + duration.seconds();
-      this.currentTabTimeWhileOpen = hrs.slice(-2) + ':' + mins.slice(-2) + ':' + secs.slice(-2);
+      const duration = this.$moment.duration(this.editors[this.tabIndex].time.open);
+      const {hours, minutes, seconds} = this.getFormattedTimes(duration);
+      this.currentTabTimeWhileOpen = `${hours}:${minutes}:${seconds}`;
     },
     setCurrentTabTimeWhileFocus() {
-      let duration = this.$moment.duration(this.editors[this.tabIndex].time.focus);
-      let hrs = '0' + duration.hours(),
-          mins = '0' + duration.minutes(),
-          secs = '0' + duration.seconds();
-      this.currentTabTimeWhileFocus = hrs.slice(-2) + ':' + mins.slice(-2) + ':' + secs.slice(-2);
+      const duration = this.$moment.duration(this.editors[this.tabIndex].time.focus);
+      const {hours, minutes, seconds} = this.getFormattedTimes(duration);
+      this.currentTabTimeWhileFocus = `${hours}:${minutes}:${seconds}`;
+    },
+    getFormattedTimes(duration) {
+      let hours = '0' + duration.hours();
+      let minutes = '0' + duration.minutes();
+      let seconds = '0' + duration.seconds();
+      hours = hours.slice(-2);
+      minutes = minutes.slice(-2);
+      seconds = seconds.slice(-2);
+
+      return {hours, minutes, seconds};
     },
   }
 }
