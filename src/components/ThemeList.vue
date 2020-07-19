@@ -137,4 +137,12 @@
       .theme-item__title
         color: var(--primary)
 
+  @media (max-width: 767px)
+    .theme-list
+      flex-direction: column
+    .theme-item + .theme-item
+      margin-left: 0
+    .theme-item__title
+      margin-top: 6px
+      text-align: left
 </style>

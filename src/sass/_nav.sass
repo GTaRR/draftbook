@@ -8,10 +8,13 @@
 .nav-pills .nav-link.active, .nav-pills .show > .nav-link
   background-color: var(--primary)
 
+.nav-item
+  transition: height .6s
+
 .nav-link
-  transition: all .3s, width .6s ease-in-out
   background-color: var(--light)
   width: 256px
+  transition: all .3s, width .6s ease-in-out
   .nav-item:not(:last-child) &
     border-bottom: 1px solid var(--light-hover)
     .colored:not(.dark) &
@@ -21,7 +24,5 @@
     white-space: nowrap
     overflow: hidden
     line-height: 1.95rem
-  @media (max-width: 768px)
-    width: 100%
   &:hover
     background-color: var(--light-hover)

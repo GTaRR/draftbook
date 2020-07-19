@@ -1,25 +1,31 @@
-.collapse-tabs
-  .nav-link
-    width: 72px
-    padding-left: 1rem
-    padding-right: 1rem
-  .logo-title
-    opacity: 0
-    width: 0
-  .nav-wrapper
-    width: 4.5rem
-    overflow: hidden
-  .card-header
-    width: 4.5rem
-    overflow: hidden
-  .import-wrapper
-    flex-direction: column
-    span
-      display: none
-    .btn
-      max-width: 4.5rem
+@media (min-width: 768px)
+  .collapse-tabs
+    .nav-link
+      width: 72px
+      padding-left: 1rem
+      padding-right: 1rem
+    .logo-title
+      opacity: 0
+      width: 0
+    .nav-wrapper
       width: 4.5rem
-      height: 4.5rem
-      border-bottom: 1px solid var(--light-hover)
-    .btn + .btn
-      border-left: none
+      overflow: hidden
+    .card-header
+      width: 4.5rem
+      overflow: hidden
+    .import-wrapper
+      flex-direction: column
+      span
+        display: none
+      .btn
+        max-width: 4.5rem
+        width: 4.5rem
+        height: 4.5rem
+        border-bottom: 1px solid var(--light-hover)
+      .btn + .btn
+        border-left: none
+@media (max-width: 767px)
+  .collapse-tabs
+    .nav-item
+      height: 0
+      overflow: hidden

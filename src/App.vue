@@ -173,7 +173,7 @@
               button-variant="light"
               v-model="fixedSidebar"
               button
-              class="flex-fill fixed-checkbox"
+              class="flex-fill fixed-checkbox fixed-btn"
             >
               <i class="fas fa-thumbtack"></i>
             </b-form-checkbox>
@@ -575,6 +575,16 @@ export default {
 
       return {hours, minutes, seconds};
     },
+
+    debounce(f, ms) {
+      let isCooldown = false;
+      return function () {
+        if (isCooldown) return;
+        f.apply(this, arguments);
+        isCooldown = true;
+        setTimeout(() => isCooldown = false, ms);
+      };
+  },
   }
 }
 </script>

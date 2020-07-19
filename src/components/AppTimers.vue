@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-3 d-flex align-items-center flex-wrap">
+  <div class="mt-3 app-timers">
     <span class="mr-2">
       <span class="text-dark mr-2">Заметка создана:</span>
       <span
@@ -27,3 +27,14 @@
     props: ['editor', 'currentTabTimeDiff', 'currentTabTimeWhileOpen', 'currentTabTimeWhileFocus']
   }
 </script>
+
+<style scoped lang="sass">
+  .app-timers
+    display: flex
+    align-items: center
+    flex-wrap: wrap
+  @media (max-width: 767px)
+    .app-timers
+      flex-direction: column
+      align-items: flex-start
+</style>
