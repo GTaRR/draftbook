@@ -1,194 +1,164 @@
 <template>
   <div id="app">
-    <b-card
-      no-body
-      :class="{dark: darkMode, colored: coloredMode}"
-    >
-      <b-tabs
-        :value="tabIndex"
-        @input="clickTab"
-        pills
-        card
-        vertical
-        lazy
-        ref="tabsWrapper"
-        :nav-class="{'fixed-nav':fixedSidebar}"
-        nav-wrapper-class="nav-wrapper"
-      >
+    <app-sidebar>
+      <app-header @toggleSidebar="collapse = !collapse" />
 
-        <template slot="tabs-start">
-          <app-header @toggleSidebar="collapse = !collapse" />
-        </template>
-
-        <b-tab
+      <app-tabs ref="tabsWrapper">
+        <app-tab
           v-for="(editor, key) in editors"
           :key="editor.id"
-          title-link-class="d-flex justify-content-between"
+          :value="tabIndex"
           @click="$store.commit('setActiveEditor', editor.id)"
+          :editor="editor"
         >
-
-          <template slot="title">
-            <span
-              class="tab-title"
-              @dblclick="focusTitle"
-              v-b-tooltip="editor.name"
-            >{{ editor.name }}</span>
-            <span
-              v-if="!collapse"
-              class="btn btn-sm"
-              :class="(tabIndex === key) ? 'btn-primary' : 'btn-light'"
-              @click="closeTab(key)"
-            >
-              <i class="fas fa-times"></i>
-            </span>
-          </template>
-
-          <b-card-text>
-
-            <b-form-input
-              ref="titleInput"
-              :value="editor.name"
-              class="mb-2"
-              placeholder="Имя заметки"
-              @input="changeEditorName"
-            />
-
-            <ckeditor
-              :editor="classicEditor"
-              :value="editor.data"
-              :config="{}"
-              @input="changeEditorData"
-              @focus="inFocus = true"
-              @blur="inFocus = false"
-            />
-
-            <app-timers
-              :editor="editor"
-              :currentTabTimeDiff="currentTabTimeDiff"
-              :currentTabTimeWhileOpen="currentTabTimeWhileOpen"
-              :currentTabTimeWhileFocus="currentTabTimeWhileFocus"
-            />
-
-            <b-modal id="settingsModal" size="xl" centered title="Настройки">
-              <h4>Тема</h4>
-              <hr>
-              <theme-list @changeTheme="setTheme" />
-
-              <hr>
-              <h4>Цвет</h4>
-              <hr>
-              <color-picker v-bind="color" @input="setColor"></color-picker>
-
-              <template v-slot:modal-footer="{ ok }">
-                <b-button variant="primary" @click="ok()">
-                  OK
-                </b-button>
-              </template>
-            </b-modal>
-
-            <b-modal id="sourceViewer" size="xl" centered title="Исходный код">
-              <codemirror
-                ref="cmEditor"
-                :value="sourceCodeEditorDataBeautify"
-                :options="cmOptions"
-                @ready="onCmReady"
-                @input="onCmCodeChange"
-              />
-
-              <template v-slot:modal-footer="{ ok }">
-                <b-button variant="primary" @click="ok()">
-                  <i class="fas fa-save mr-2"></i>Сохранить
-                </b-button>
-                <b-button variant="dark" @click="copySource" ref="copyInBufferBtn">
-                  <i class="fas fa-clipboard mr-2"></i>Скопировать
-                </b-button>
-              </template>
-            </b-modal>
-
-          </b-card-text>
-
-        </b-tab>
-
-        <template slot="tabs-end">
-
-          <b-nav-item
-            @click.prevent="$store.dispatch('newTab')"
-            class="text-center"
-            href="#"
+          <span
+            class="tab-title"
+            @dblclick="focusTitle"
+            v-b-tooltip="editor.name"
+          >{{ editor.name }}</span>
+          <span
+            v-if="!collapse"
+            class="btn btn-sm"
+            :class="(tabIndex === key) ? 'btn-primary' : 'btn-light'"
+            @click="closeTab(key)"
           >
-            <i class="fas fa-plus"></i>
-          </b-nav-item>
+            <i class="fas fa-times"></i>
+          </span>
+        </app-tab>
+      </app-tabs>
 
-          <b-button-group class="mt-auto top-border">
-            <b-button
-              v-b-tooltip="'Настройки'"
-              variant="light"
-              v-if="!collapse"
-              @click="$bvModal.show('settingsModal')"
-            >
-              <i class="fas fa-cog"></i>
-            </b-button>
+      <app-footer-panel>
+        <b-nav-item
+          @click.prevent="$store.dispatch('newTab')"
+          class="text-center"
+          href="#"
+        >
+          <i class="fas fa-plus"></i>
+        </b-nav-item>
 
-            <b-form-checkbox
-              title="Темная тема"
-              v-b-tooltip="'Темная тема'"
-              button-variant="light"
-              :checked="darkMode"
-              v-if="!collapse"
-              @change="darkModeChange"
-              button
-              class="flex-fill fixed-checkbox"
-            >
-              <i class="fas fa-moon"></i>
-            </b-form-checkbox>
+        <b-button-group class="mt-auto top-border">
+          <b-button
+            v-b-tooltip="'Настройки'"
+            variant="light"
+            v-if="!collapse"
+            @click="$bvModal.show('settingsModal')"
+          >
+            <i class="fas fa-cog"></i>
+          </b-button>
 
-            <b-button
-              v-b-tooltip="'Экспорт в JSON'"
-              variant="light"
-              v-if="!collapse && 0"
-              @click="downloadJSON"
-            >
-              <i class="fas fa-download"></i>
-            </b-button>
+          <b-form-checkbox
+            title="Темная тема"
+            v-b-tooltip="'Темная тема'"
+            button-variant="light"
+            :checked="darkMode"
+            v-if="!collapse"
+            @change="darkModeChange"
+            button
+            class="flex-fill fixed-checkbox"
+          >
+            <i class="fas fa-moon"></i>
+          </b-form-checkbox>
 
-            <b-button
-              v-b-tooltip="'Импорт из JSON'"
-              variant="light"
-              v-if="!collapse && 0"
-              @click="uploadJSON"
-            >
-              <i class="fas fa-upload"></i>
-            </b-button>
+          <b-button
+            v-b-tooltip="'Экспорт в JSON'"
+            variant="light"
+            v-if="!collapse && 0"
+            @click="downloadJSON"
+          >
+            <i class="fas fa-download"></i>
+          </b-button>
 
-            <input
-              class="d-none"
-              type="file"
-              accept="application/json"
-              ref="fileInput"
-            />
+          <b-button
+            v-b-tooltip="'Импорт из JSON'"
+            variant="light"
+            v-if="!collapse && 0"
+            @click="uploadJSON"
+          >
+            <i class="fas fa-upload"></i>
+          </b-button>
 
-            <b-form-checkbox
-              title="Фиксирование сайдбара"
-              v-b-tooltip="'Фиксирование сайдбара'"
-              button-variant="light"
-              v-model="fixedSidebar"
-              button
-              class="flex-fill fixed-checkbox fixed-btn"
-            >
-              <i class="fas fa-thumbtack"></i>
-            </b-form-checkbox>
-          </b-button-group>
+          <input
+            class="d-none"
+            type="file"
+            accept="application/json"
+            ref="fileInput"
+          />
 
+          <b-form-checkbox
+            title="Фиксирование сайдбара"
+            v-b-tooltip="'Фиксирование сайдбара'"
+            button-variant="light"
+            v-model="fixedSidebar"
+            button
+            class="flex-fill fixed-checkbox fixed-btn"
+          >
+            <i class="fas fa-thumbtack"></i>
+          </b-form-checkbox>
+        </b-button-group>
+      </app-footer-panel>
+    </app-sidebar>
+
+    <app-main>
+      <b-form-input
+        ref="titleInput"
+        :value="currentEditor.name"
+        class="mb-2"
+        placeholder="Имя заметки"
+        @input="changeEditorName"
+      />
+
+      <ckeditor
+        :editor="classicEditor"
+        :value="currentEditor.data"
+        :config="{}"
+        @input="changeEditorData"
+        @focus="inFocus = true"
+        @blur="inFocus = false"
+      />
+
+      <app-timers
+        :editor="currentEditor"
+        :currentTabTimeDiff="currentTabTimeDiff"
+        :currentTabTimeWhileOpen="currentTabTimeWhileOpen"
+        :currentTabTimeWhileFocus="currentTabTimeWhileFocus"
+      />
+
+      <b-modal id="settingsModal" size="xl" centered title="Настройки">
+        <h4>Тема</h4>
+        <hr>
+        <theme-list @changeTheme="setTheme" />
+
+        <hr>
+        <h4>Цвет</h4>
+        <hr>
+        <color-picker v-bind="color" @input="setColor"></color-picker>
+
+        <template v-slot:modal-footer="{ ok }">
+          <b-button variant="primary" @click="ok()">
+            OK
+          </b-button>
         </template>
+      </b-modal>
 
-        <div slot="empty" class="text-center text-muted pt-5">
-          Не создано ни одной заметки<br>
-          создайте новую при помощи кнопки <b>+</b>
-        </div>
+      <b-modal id="sourceViewer" size="xl" centered title="Исходный код">
+        <codemirror
+          ref="cmEditor"
+          :value="sourceCodeEditorDataBeautify"
+          :options="cmOptions"
+          @ready="onCmReady"
+          @input="onCmCodeChange"
+        />
 
-      </b-tabs>
-    </b-card>
-
+        <template v-slot:modal-footer="{ ok }">
+          <b-button variant="primary" @click="ok()">
+            <i class="fas fa-save mr-2"></i>Сохранить
+          </b-button>
+          <b-button variant="dark" @click="copySource" ref="copyInBufferBtn">
+            <i class="fas fa-clipboard mr-2"></i>Скопировать
+          </b-button>
+        </template>
+      </b-modal>
+    </app-main>
   </div>
 </template>
 
@@ -199,13 +169,18 @@ import { mapGetters } from 'vuex';
 
 import ClassicEditor from './ckeditor';
 
-import ThemeList from './components/ThemeList';
+import AppSidebar from './components/AppSidebar';
 import AppHeader from './components/AppHeader';
+import AppTabs from './components/AppTabs';
+import AppTab from './components/AppTab';
+import AppFooterPanel from './components/AppFooterPanel';
+import AppMain from './components/AppMain';
 import AppTimers from './components/AppTimers';
+import ThemeList from './components/ThemeList';
 
 export default {
   name: 'app',
-  components: { ColorPicker, ThemeList, AppHeader, AppTimers },
+  components: { ColorPicker, ThemeList, AppSidebar, AppHeader, AppTabs, AppTab, AppFooterPanel, AppMain, AppTimers },
   data(){
     return {
       classicEditor: ClassicEditor,
@@ -246,6 +221,7 @@ export default {
       'editors',
       'tabIndex',
       'activeEditor',
+      'currentEditor',
 
       // theme
       'color',
