@@ -10,6 +10,7 @@
           :value="tabIndex"
           @click="$store.commit('setActiveEditor', editor.id)"
           :editor="editor"
+          :active="(tabIndex === key)"
         >
           <span
             class="tab-title"
@@ -18,24 +19,21 @@
           >{{ editor.name }}</span>
           <span
             v-if="!collapse"
-            class="btn btn-sm"
-            :class="(tabIndex === key) ? 'btn-primary' : 'btn-light'"
+            class="tab-close"
             @click="closeTab(key)"
           >
             <i class="fas fa-times"></i>
           </span>
         </app-tab>
+        <div
+            @click.prevent="$store.dispatch('newTab')"
+            class="tab-item tab-plus"
+        >
+          <i class="fas fa-plus"></i>
+        </div>
       </app-tabs>
 
       <app-footer-panel>
-        <b-nav-item
-          @click.prevent="$store.dispatch('newTab')"
-          class="text-center"
-          href="#"
-        >
-          <i class="fas fa-plus"></i>
-        </b-nav-item>
-
         <b-button-group class="mt-auto top-border">
           <b-button
             v-b-tooltip="'Настройки'"

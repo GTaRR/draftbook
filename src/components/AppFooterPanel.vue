@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="footer-panel">
     <slot></slot>
   </div>
 </template>
@@ -10,6 +10,7 @@
   }
 </script>
 
-<style scoped>
-
+<style lang="sass">
+  .footer-panel
+    margin-top: auto
 </style>
