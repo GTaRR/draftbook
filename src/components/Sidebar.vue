@@ -18,6 +18,7 @@
     display: flex
     flex-direction: column
     flex-wrap: nowrap
+    flex: 0 0 auto
     min-height: 100vh
     width: 256px
     max-width: 256px

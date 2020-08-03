@@ -1,5 +1,5 @@
 <template>
-  <div class="tab-item" :class="{active}">
+  <div class="tab-item" :class="{ active }">
     <slot></slot>
   </div>
 </template>
