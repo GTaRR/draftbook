@@ -1,3 +1,26 @@
+[type=button]:not(:disabled), [type=reset]:not(:disabled), [type=submit]:not(:disabled), button:not(:disabled)
+  cursor: pointer
+
+.btn:not(:disabled):not(.disabled)
+  cursor: pointer
+
+.btn
+  display: inline-block
+  font-weight: 400
+  color: #212529
+  text-align: center
+  vertical-align: middle
+  user-select: none
+  background-color: transparent
+  border: 1px solid transparent
+  padding: .375rem .75rem
+  font-size: 1rem
+  line-height: 1.5
+  border-radius: 0
+  transition: color .15s ease-in-out, background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out,-webkit-box-shadow .15s ease-in-out
+  &:focus
+    outline: 0
+
 .btn-light
   color: var(--link)
   background-color: var(--light)

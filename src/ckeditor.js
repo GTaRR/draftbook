@@ -18,7 +18,7 @@ import List from '@ckeditor/ckeditor5-list/src/list';
 import BlockQuote from '@ckeditor/ckeditor5-block-quote/src/blockquote';
 // import Subscript from '@ckeditor/ckeditor5-basic-styles/src/subscript';
 // import Superscript from '@ckeditor/ckeditor5-basic-styles/src/superscript';
-// import Font from '@ckeditor/ckeditor5-font/src/font';
+import Font from '@ckeditor/ckeditor5-font/src/font';
 
 import Table from '@ckeditor/ckeditor5-table/src/table';
 import TableToolbar from '@ckeditor/ckeditor5-table/src/tabletoolbar';
@@ -58,7 +58,7 @@ ClassicEditor.builtinPlugins = [
     Table,
     TableToolbar,
 
-    // Font,
+    Font,
     RemoveFormat,
 
     // ClipBoard,
@@ -78,8 +78,10 @@ ClassicEditor.defaultConfig = {
         '|',
         'link', 'bulletedList', 'numberedList', 'blockQuote', "insertTable",
         // '|',
-        // 'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor',
+        // 'fontSize', 'fontFamily',
         '|',
+        'fontColor', 'fontBackgroundColor',
+        // '|',
         'removeFormat',
         '|',
         'undo', 'redo',
