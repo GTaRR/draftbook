@@ -30,13 +30,11 @@ export default {
     ],
     activeEditor: 0,
     tabIndex: 0,
-    currentEditor: null,
   },
   getters: {
     editors: s => s.editors,
     activeEditor: s => s.activeEditor,
     tabIndex: s => s.tabIndex,
-    currentEditor: s => s.currentEditor,
   },
   mutations: {
     setTabIndex(state, index) {

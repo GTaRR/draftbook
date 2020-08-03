@@ -16,7 +16,9 @@
             class="tab-title"
             @dblclick="focusTitle"
             v-b-tooltip="editor.name"
-          >{{ editor.name }}</span>
+          >
+            {{ editor.name }}
+          </span>
           <span
             v-if="!collapse"
             class="tab-close"
@@ -26,14 +28,24 @@
           </span>
         </app-tab>
         <div
-            @click.prevent="$store.dispatch('newTab')"
-            class="tab-item tab-plus"
+          @click.prevent="$store.dispatch('newTab')"
+          class="tab-item tab-plus"
         >
           <i class="fas fa-plus"></i>
         </div>
       </app-tabs>
 
       <app-footer-panel>
+        <buttons-group>
+          <app-button
+            v-b-tooltip="'Настройки'"
+            v-if="!collapse"
+            @click="$bvModal.show('settingsModal')"
+          >
+            <i class="fas fa-cog"></i>
+          </app-button>
+        </buttons-group>
+
         <b-button-group class="mt-auto top-border">
           <b-button
             v-b-tooltip="'Настройки'"
@@ -97,7 +109,7 @@
     </app-sidebar>
 
     <app-main>
-      <b-form-input
+      <title-input
         ref="titleInput"
         :value="currentEditor.name"
         class="mb-2"
@@ -167,18 +179,35 @@ import { mapGetters } from 'vuex';
 
 import ClassicEditor from './ckeditor';
 
-import AppSidebar from './components/AppSidebar';
-import AppHeader from './components/AppHeader';
-import AppTabs from './components/AppTabs';
-import AppTab from './components/AppTab';
-import AppFooterPanel from './components/AppFooterPanel';
-import AppMain from './components/AppMain';
-import AppTimers from './components/AppTimers';
+import AppSidebar from './components/Sidebar';
+import AppHeader from './components/Header';
+import AppTabs from './components/Tabs';
+import AppTab from './components/Tab';
+import AppFooterPanel from './components/FooterPanel';
+import AppMain from './components/Main';
+import TitleInput from './components/TitleInput';
+import AppTimers from './components/Timers';
 import ThemeList from './components/ThemeList';
+
+import ButtonsGroup from './components/buttons/ButtonsGroup'
+import AppButton from './components/buttons/AppButton'
 
 export default {
   name: 'app',
-  components: { ColorPicker, ThemeList, AppSidebar, AppHeader, AppTabs, AppTab, AppFooterPanel, AppMain, AppTimers },
+  components: {
+    ColorPicker,
+    ThemeList,
+    AppSidebar,
+    AppHeader,
+    AppTabs,
+    AppTab,
+    AppFooterPanel,
+    AppMain,
+    TitleInput,
+    AppTimers,
+    ButtonsGroup,
+    AppButton,
+  },
   data(){
     return {
       classicEditor: ClassicEditor,
@@ -219,7 +248,6 @@ export default {
       'editors',
       'tabIndex',
       'activeEditor',
-      'currentEditor',
 
       // theme
       'color',
@@ -228,7 +256,10 @@ export default {
       'customColor',
       'theme',
       'themes'
-    ])
+    ]),
+    currentEditor() {
+      return this.editors[this.tabIndex];
+    }
   },
   created: function(){
     this.$store.commit('loadEditors');
@@ -470,9 +501,9 @@ export default {
     },
 
     focusTitle() {
-      let classList = this.$refs.titleInput[0].$el.classList;
+      let classList = this.$refs.titleInput.$el.classList;
 
-      this.$refs.titleInput[0].focus();
+      this.$refs.titleInput.focus();
       classList.add('animated');
       classList.add('shake');
 
