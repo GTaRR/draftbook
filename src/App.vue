@@ -24,14 +24,14 @@
             class="tab-close"
             @click="closeTab(key)"
           >
-            <i class="fas fa-times"></i>
+            <font-awesome-icon :icon="['fas', 'times']" />
           </span>
         </app-tab>
         <div
           @click.prevent="$store.dispatch('newTab')"
           class="tab-item tab-plus"
         >
-          <i class="fas fa-plus"></i>
+          <font-awesome-icon :icon="['fas', 'plus']" />
         </div>
       </app-tabs>
 
@@ -42,69 +42,49 @@
             v-if="!collapse"
             @click="$bvModal.show('settingsModal')"
           >
-            <i class="fas fa-cog"></i>
+            <font-awesome-icon :icon="['fas', 'cog']" />
           </app-button>
-        </buttons-group>
 
-        <b-button-group class="mt-auto top-border">
-          <b-button
-            v-b-tooltip="'Настройки'"
-            variant="light"
-            v-if="!collapse"
-            @click="$bvModal.show('settingsModal')"
-          >
-            <i class="fas fa-cog"></i>
-          </b-button>
-
-          <b-form-checkbox
+          <checkbox-button
+            v-model="darkMode"
+            @input="darkModeChange"
             title="Темная тема"
-            v-b-tooltip="'Темная тема'"
-            button-variant="light"
-            :checked="darkMode"
-            v-if="!collapse"
-            @change="darkModeChange"
-            button
-            class="flex-fill fixed-checkbox"
           >
-            <i class="fas fa-moon"></i>
-          </b-form-checkbox>
+            <font-awesome-icon :icon="['fas', 'moon']" />
+          </checkbox-button>
 
-          <b-button
+          <app-button
             v-b-tooltip="'Экспорт в JSON'"
             variant="light"
             v-if="!collapse && 0"
             @click="downloadJSON"
           >
-            <i class="fas fa-download"></i>
-          </b-button>
+            <font-awesome-icon :icon="['fas', 'download']" />
+          </app-button>
 
-          <b-button
+          <app-button
             v-b-tooltip="'Импорт из JSON'"
             variant="light"
             v-if="!collapse && 0"
             @click="uploadJSON"
           >
-            <i class="fas fa-upload"></i>
-          </b-button>
+            <font-awesome-icon :icon="['fas', 'upload']" />
+          </app-button>
 
           <input
-            class="d-none"
+            style="display: none;"
             type="file"
             accept="application/json"
             ref="fileInput"
           />
 
-          <b-form-checkbox
+          <checkbox-button
             title="Фиксирование сайдбара"
-            v-b-tooltip="'Фиксирование сайдбара'"
-            button-variant="light"
             v-model="fixedSidebar"
-            button
-            class="flex-fill fixed-checkbox fixed-btn"
           >
-            <i class="fas fa-thumbtack"></i>
-          </b-form-checkbox>
-        </b-button-group>
+            <font-awesome-icon :icon="['fas', 'thumbtack']" />
+          </checkbox-button>
+        </buttons-group>
       </app-footer-panel>
     </app-sidebar>
 
@@ -112,10 +92,9 @@
       <title-input
         ref="titleInput"
         :value="currentEditor.name"
-        class="mb-2"
         placeholder="Имя заметки"
         @input="changeEditorName"
-      />
+      ></title-input>
 
       <ckeditor
         :editor="classicEditor"
@@ -124,14 +103,14 @@
         @input="changeEditorData"
         @focus="inFocus = true"
         @blur="inFocus = false"
-      />
+      ></ckeditor>
 
       <app-timers
         :editor="currentEditor"
         :currentTabTimeDiff="currentTabTimeDiff"
         :currentTabTimeWhileOpen="currentTabTimeWhileOpen"
         :currentTabTimeWhileFocus="currentTabTimeWhileFocus"
-      />
+      ></app-timers>
 
       <b-modal id="settingsModal" size="xl" centered title="Настройки">
         <h4>Тема</h4>
@@ -157,14 +136,14 @@
           :options="cmOptions"
           @ready="onCmReady"
           @input="onCmCodeChange"
-        />
+        ></codemirror>
 
         <template v-slot:modal-footer="{ ok }">
           <b-button variant="primary" @click="ok()">
-            <i class="fas fa-save mr-2"></i>Сохранить
+            <font-awesome-icon :icon="['fas', 'save']" />Сохранить
           </b-button>
           <b-button variant="dark" @click="copySource" ref="copyInBufferBtn">
-            <i class="fas fa-clipboard mr-2"></i>Скопировать
+            <font-awesome-icon :icon="['fas', 'clipboard']" />Скопировать
           </b-button>
         </template>
       </b-modal>
@@ -191,6 +170,7 @@ import ThemeList from './components/ThemeList';
 
 import ButtonsGroup from './components/buttons/ButtonsGroup'
 import AppButton from './components/buttons/AppButton'
+import CheckboxButton from "@/components/buttons/CheckboxButton";
 
 export default {
   name: 'app',
@@ -207,6 +187,7 @@ export default {
     AppTimers,
     ButtonsGroup,
     AppButton,
+    CheckboxButton,
   },
   data(){
     return {

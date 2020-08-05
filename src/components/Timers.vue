@@ -6,9 +6,7 @@
         class="timers__time"
         v-b-tooltip.hover
         :title="editor.time.create | moment('Do MMMM YYYY, H:mm:ss')"
-      >
-        {{ currentTabTimeDiff }}
-      </span>
+      >{{ currentTabTimeDiff }}</span>
     </span>
     <span class="timers__item">
       <span class="timers__label">Заметка открыта:</span>

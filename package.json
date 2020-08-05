@@ -30,6 +30,9 @@
     "@ckeditor/ckeditor5-theme-lark": "^17.0.0",
     "@ckeditor/ckeditor5-ui": "^17.0.0",
     "@ckeditor/ckeditor5-vue": "^1.0.1",
+    "@fortawesome/fontawesome-svg-core": "^1.2.30",
+    "@fortawesome/free-solid-svg-icons": "^5.14.0",
+    "@fortawesome/vue-fontawesome": "^0.1.10",
     "@radial-color-picker/vue-color-picker": "^3.0.0",
     "bootstrap": "^4.4.1",
     "bootstrap-icons": "^1.0.0-alpha3",
@@ -48,7 +51,6 @@
     "vuex": "^3.4.0"
   },
   "devDependencies": {
-    "@fortawesome/fontawesome-free": "^5.12.1",
     "@vue/cli-plugin-babel": "^4.2.3",
     "@vue/cli-plugin-eslint": "^4.2.3",
     "@vue/cli-service": "^4.2.3",

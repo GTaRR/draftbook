@@ -1,5 +1,5 @@
 <template>
-  <div class="btn-group">
+  <div class="btn-group top-border">
     <slot></slot>
   </div>
 </template>
@@ -15,6 +15,7 @@ export default {
     position: relative
     display: inline-flex
     vertical-align: middle
+    width: 100%
   .btn-group > .btn
     position: relative
     flex: 1 1 auto

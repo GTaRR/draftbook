@@ -2,7 +2,9 @@
   <header class="main-header">
     <button class="main-header__btn btn btn-primary"
             @click="toggleSidebar"
-    ><i class="fas fa-bars"></i></button>
+    >
+      <font-awesome-icon :icon="['fas', 'bars']" />
+    </button>
     <span class="main-header__title">Draftbook</span>
   </header>
 </template>

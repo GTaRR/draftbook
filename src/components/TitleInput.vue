@@ -1,10 +1,11 @@
 <template>
   <input
-      type="text"
-      class="form-control editor-title"
-      :value="value"
-      :placeholder="placeholder"
-      ref="input"
+    type="text"
+    class="form-control editor-title"
+    :value="value"
+    :placeholder="placeholder"
+    ref="input"
+    @input="$emit('input', $event.target.value)"
   />
 </template>
 
@@ -15,7 +16,7 @@ export default {
   methods: {
     focus() {
       this.$refs.input.focus();
-    }
+    },
   }
 }
 </script>
