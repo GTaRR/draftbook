@@ -4,14 +4,21 @@
       <app-header @toggleSidebar="collapse = !collapse" />
 
       <app-tabs ref="tabsWrapper">
+        <draggable
+          :list="editors"
+          class="list-group"
+          ghost-class="ghost"
+          handle=".drag-icon"
+        >
         <app-tab
           v-for="(editor, key) in editors"
           :key="editor.id"
           :value="tabIndex"
-          @click="$store.commit('setActiveEditor', editor.id)"
+          @click="clickTab(key)"
           :editor="editor"
           :active="(tabIndex === key)"
         >
+          <font-awesome-icon :icon="['fas', 'sort']" class="drag-icon" />
           <span
             class="tab-title"
             @dblclick="focusTitle"
@@ -22,11 +29,12 @@
           <span
             v-if="!collapse"
             class="tab-close"
-            @click="closeTab(key)"
+            @click="$store.dispatch('closeTab', key)"
           >
             <font-awesome-icon :icon="['fas', 'times']" />
           </span>
         </app-tab>
+        </draggable>
         <div
           @click.prevent="$store.dispatch('newTab')"
           class="tab-item tab-plus"
@@ -172,10 +180,13 @@ import ButtonsGroup from './components/buttons/ButtonsGroup'
 import AppButton from './components/buttons/AppButton'
 import CheckboxButton from "@/components/buttons/CheckboxButton";
 
+import Draggable from 'vuedraggable';
+
 export default {
   name: 'app',
   components: {
     ColorPicker,
+    Draggable,
     ThemeList,
     AppSidebar,
     AppHeader,
@@ -239,7 +250,7 @@ export default {
       'themes'
     ]),
     currentEditor() {
-      return this.editors[this.tabIndex];
+      return this.editors[this.activeEditor];
     }
   },
   created: function(){
@@ -458,6 +469,7 @@ export default {
     },
     onCmReady() {},
 
+    // JSON Experimental
     downloadJSON() {
       let blob = new Blob([JSON.stringify(this.editors)], {type : 'application/json'});
       let link = document.createElement('a');
@@ -469,6 +481,7 @@ export default {
       this.$refs.fileInput.click();
     },
 
+    // Editor change handlers
     changeData() {
       if (!document.hidden) {
         this.$store.dispatch('setLocalStorageEditors');
@@ -495,31 +508,9 @@ export default {
     },
 
     // tabs
-    closeTab(x) {
-      for (let editor in this.editors) {
-        if(!({}).hasOwnProperty.call(this.editors, editor)) continue;
-
-        if (parseInt(editor) === x) {
-          this.editors.splice(parseInt(editor), 1);
-          this.$store.dispatch('setLocalStorageEditors');
-        }
-      }
-    },
-    newTab() {
-      this.editors.push({
-        id: Date.now(),
-        name: 'Новая заметка',
-        data: 'Текст заметки',
-        time: {
-          create: this.$moment(),
-          open: 0,
-          focus: 0
-        }
-      });
-      this.$store.dispatch('setLocalStorageEditors');
-    },
-    clickTab(tabId) {
-      this.$store.commit('setTabIndex', tabId);
+    clickTab(id) {
+      this.$store.commit('setTabIndex', id);
+      this.$store.commit('setActiveEditor', id);
     },
 
     // timers
@@ -561,16 +552,6 @@ export default {
 
       return {hours, minutes, seconds};
     },
-
-    debounce(f, ms) {
-      let isCooldown = false;
-      return function () {
-        if (isCooldown) return;
-        f.apply(this, arguments);
-        isCooldown = true;
-        setTimeout(() => isCooldown = false, ms);
-      };
-  },
   }
 }
 </script>

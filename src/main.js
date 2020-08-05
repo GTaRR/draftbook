@@ -19,7 +19,11 @@ import {
   faThumbtack,
   faSave,
   faClipboard,
-  faBars
+  faBars,
+  faGripVertical,
+  faSort,
+  faGripLinesVertical,
+  faEllipsisV,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
@@ -33,7 +37,11 @@ library.add(
   faThumbtack,
   faSave,
   faClipboard,
-  faBars
+  faBars,
+  faGripVertical,
+  faSort,
+  faGripLinesVertical,
+  faEllipsisV
 );
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);

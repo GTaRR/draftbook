@@ -43,6 +43,15 @@ export default {
     setActiveEditor(state, id) {
       state.activeEditor = id;
     },
+    closeTab(state, x) {
+      for (let editor in state.editors) {
+        if(!({}).hasOwnProperty.call(state.editors, editor)) continue;
+
+        if (parseInt(editor) === x) {
+          state.editors.splice(parseInt(editor), 1);
+        }
+      }
+    },
     newTab(state) {
       state.editors.push({
         id: Date.now(),
@@ -84,6 +93,10 @@ export default {
     },
   },
   actions: {
+    closeTab({commit, dispatch}, x) {
+      commit('closeTab', x);
+      dispatch('setLocalStorageEditors');
+    },
     newTab({commit}) {
       commit('newTab');
       localStorage.setItem('multiple_cke_data', JSON.stringify(this.editors));
