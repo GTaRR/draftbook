@@ -12,9 +12,11 @@ import Italic from '@ckeditor/ckeditor5-basic-styles/src/italic';
 import Underline from '@ckeditor/ckeditor5-basic-styles/src/underline';
 import Strikethrough from '@ckeditor/ckeditor5-basic-styles/src/strikethrough';
 import Code from '@ckeditor/ckeditor5-basic-styles/src/code';
+// import CodeBlock from '@ckeditor/ckeditor5-code-block/src/codeblock';
 
 import Link from '@ckeditor/ckeditor5-link/src/link';
 import List from '@ckeditor/ckeditor5-list/src/list';
+import TodoList from '@ckeditor/ckeditor5-list/src/todolist';
 import BlockQuote from '@ckeditor/ckeditor5-block-quote/src/blockquote';
 // import Subscript from '@ckeditor/ckeditor5-basic-styles/src/subscript';
 // import Superscript from '@ckeditor/ckeditor5-basic-styles/src/superscript';
@@ -32,7 +34,7 @@ import SourceView from './plugins/sourceview';
 
 import '@ckeditor/ckeditor5-build-classic/build/translations/ru';
 
-import '@/sass/ckeditor_overrides.sass'
+import '@/sass/ckeditor_overrides.sass';
 
 export default class ClassicEditor extends ClassicEditorBase {}
 
@@ -49,11 +51,13 @@ ClassicEditor.builtinPlugins = [
     Underline,
     Strikethrough,
     Code,
+    // CodeBlock,
     // Subscript,
     // Superscript,
 
     Link,
     List,
+    TodoList,
     BlockQuote,
     Table,
     TableToolbar,
@@ -69,28 +73,38 @@ ClassicEditor.builtinPlugins = [
 ];
 
 ClassicEditor.defaultConfig = {
-    toolbar: [
-        'heading',
-        '|',
-        'alignment',
-        '|',
-        'bold', 'italic', 'underline', 'strikethrough', 'code', /*'subscript', 'superscript',*/
-        '|',
-        'link', 'bulletedList', 'numberedList', 'blockQuote', "insertTable",
-        // '|',
-        // 'fontSize', 'fontFamily',
-        '|',
-        'fontColor', 'fontBackgroundColor',
-        // '|',
-        'removeFormat',
-        '|',
-        'undo', 'redo',
-        '|',
-        'sourceView'
-    ],
+    toolbar: {
+        items: [
+            'heading',
+            '|',
+            'alignment',
+            '|',
+            'bold', 'italic', 'underline', 'strikethrough', 'code', /*'codeBlock',*/
+            '|',
+            'link', 'bulletedList', 'numberedList', 'todoList', 'blockQuote', "insertTable",
+            // '|',
+            // 'fontSize', 'fontFamily',
+            '|',
+            'fontColor', 'fontBackgroundColor',
+            // '|',
+            'removeFormat',
+            '|',
+            'undo', 'redo',
+            '|',
+            'sourceView'
+        ]
+    },
     table: {
         contentToolbar: [ 'tableColumn', 'tableRow', 'mergeTableCells' ]
     },
+    // codeBlock: {
+    //     languages: [
+    //         { language: 'css', label: 'CSS' },
+    //         { language: 'html', label: 'HTML' },
+    //         { language: 'php', label: 'PHP', class: 'php-code' },
+    //         { language: 'javascript', label: 'JavaScript' },
+    //     ]
+    // },
 
     language: 'ru',
 };
