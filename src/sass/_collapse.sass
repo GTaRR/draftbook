@@ -1,10 +1,12 @@
 @media (min-width: 768px)
-  .collapse-tabs
-    .nav-link
+  .sidebar--collapse
+    .tab-item
       width: 72px
       padding-left: 1rem
       padding-right: 1rem
-    .logo-title
+      .tab-title
+        margin-left: 0
+    .main-header__title
       opacity: 0
       width: 0
     .nav-wrapper
@@ -25,7 +27,13 @@
       .btn + .btn
         border-left: none
 @media (max-width: 767px)
-  .collapse-tabs
-    .nav-item
+  .sidebar--collapse
+    .tab-item
       height: 0
       overflow: hidden
+      padding-top: 0
+      padding-bottom: 0
+      .tab-title
+        margin-left: 0
+    .footer-panel
+      display: none

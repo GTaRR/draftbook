@@ -28,6 +28,7 @@
 
     cursor: pointer
     transition: all .3s,width .6s ease-in-out
+    outline: none
     //&:not(:last-child)
       border-bottom: 1px solid var(--light-hover)
     &:hover
@@ -40,6 +41,10 @@
       color: var(--white)
       .tab-close
         background-color: var(--primary)
+        &:hover
+          background-color: var(--primary-hover)
+    &:focus
+      outline: none
 
     .tab-close
       padding: .25rem .5rem
@@ -57,6 +62,7 @@
       overflow: hidden
       line-height: 1.95rem
       margin-left: .5rem
+      user-select: none
     .drag-icon
       opacity: 0
       cursor: grab

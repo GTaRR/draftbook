@@ -1,6 +1,11 @@
 <template>
   <div class="main">
-    <slot></slot>
+    <slot>
+      <div class="main__empty">
+        Не создано ни одной заметки<br>
+        создайте новую при помощи кнопки <b>+</b>
+      </div>
+    </slot>
   </div>
 </template>
 
@@ -15,4 +20,9 @@
     display: flex
     flex-direction: column
     padding: 0 1.125rem 1.125rem
+    flex: 1 1 auto
+    &__empty
+      text-align: center
+      color: #888
+      padding-top: 3rem
 </style>

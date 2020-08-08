@@ -24,22 +24,27 @@ export default {
 
 <style scoped lang="sass">
   label.checkbox-button
-    background-color: var(--light)
-    border: 1px solid var(--light)
-    color: var(--link)
+    height: 38px
+    padding: .375rem .75rem
+    margin-bottom: 0
+
     display: inline-flex
     align-items: center
     justify-content: center
-    cursor: pointer
     flex: 1 1 auto
-    padding: .375rem .75rem
-    margin-bottom: 0
+
+    background-color: var(--light)
+    color: var(--link)
+    border: 1px solid var(--light)
+    border-radius: 0
+
+    font-size: 1rem
+    line-height: 1.5
     text-align: center
     vertical-align: middle
     user-select: none
-    font-size: 1rem
-    line-height: 1.5
-    border-radius: 0
+    cursor: pointer
+
     transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out, -webkit-box-shadow .15s ease-in-out
     &:hover
       color: var(--link)

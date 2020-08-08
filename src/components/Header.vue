@@ -15,7 +15,7 @@
     methods: {
       toggleSidebar() {
         this.$emit('toggleSidebar');
-        this.$parent.$parent.$refs.tabsWrapper.$el.classList.toggle('collapse-tabs');
+        this.$parent.$parent.$refs.sidebar.$el.classList.toggle('sidebar--collapse');
       },
     }
   }

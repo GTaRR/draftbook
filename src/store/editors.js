@@ -44,8 +44,15 @@ export default {
       state.activeEditor = id;
     },
     closeTab(state, x) {
+      let isSetActiveEditor = false;
       for (let editor in state.editors) {
-        if(!({}).hasOwnProperty.call(state.editors, editor)) continue;
+        if (!({}).hasOwnProperty.call(state.editors, editor))
+          continue;
+
+        if (state.activeEditor === x && !isSetActiveEditor && parseInt(editor) !== x) {
+          state.tabIndex = state.activeEditor = parseInt(editor);
+          isSetActiveEditor = true;
+        }
 
         if (parseInt(editor) === x) {
           state.editors.splice(parseInt(editor), 1);

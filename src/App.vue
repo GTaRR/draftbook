@@ -1,39 +1,39 @@
 <template>
   <div id="app">
-    <app-sidebar>
+    <app-sidebar ref="sidebar">
       <app-header @toggleSidebar="collapse = !collapse" />
 
-      <app-tabs ref="tabsWrapper">
+      <app-tabs>
         <draggable
           :list="editors"
           class="list-group"
           ghost-class="ghost"
           handle=".drag-icon"
         >
-        <app-tab
-          v-for="(editor, key) in editors"
-          :key="editor.id"
-          :value="tabIndex"
-          @click="clickTab(key)"
-          :editor="editor"
-          :active="(tabIndex === key)"
-        >
-          <font-awesome-icon :icon="['fas', 'sort']" class="drag-icon" />
-          <span
-            class="tab-title"
-            @dblclick="focusTitle"
-            v-b-tooltip="editor.name"
+          <app-tab
+            v-for="(editor, key) in editors"
+            :key="editor.id"
+            :value="tabIndex"
+            @click="clickTab(key)"
+            :editor="editor"
+            :active="(tabIndex === key)"
           >
-            {{ editor.name }}
-          </span>
-          <span
-            v-if="!collapse"
-            class="tab-close"
-            @click="$store.dispatch('closeTab', key)"
-          >
-            <font-awesome-icon :icon="['fas', 'times']" />
-          </span>
-        </app-tab>
+            <font-awesome-icon :icon="['fas', 'sort']" class="drag-icon" v-if="!collapse" />
+            <span
+              class="tab-title"
+              @dblclick="focusTitle"
+              v-b-tooltip="editor.name"
+            >
+              {{ editor.name }}
+            </span>
+            <span
+              v-if="!collapse"
+              class="tab-close"
+              @click="$store.dispatch('closeTab', key)"
+            >
+              <font-awesome-icon :icon="['fas', 'times']" />
+            </span>
+          </app-tab>
         </draggable>
         <div
           @click.prevent="$store.dispatch('newTab')"
@@ -49,6 +49,7 @@
             v-b-tooltip="'Настройки'"
             v-if="!collapse"
             @click="$bvModal.show('settingsModal')"
+            variant="light"
           >
             <font-awesome-icon :icon="['fas', 'cog']" />
           </app-button>
@@ -57,6 +58,7 @@
             v-model="darkMode"
             @input="darkModeChange"
             title="Темная тема"
+            v-if="!collapse"
           >
             <font-awesome-icon :icon="['fas', 'moon']" />
           </checkbox-button>
@@ -89,6 +91,7 @@
           <checkbox-button
             title="Фиксирование сайдбара"
             v-model="fixedSidebar"
+            class="fixed-btn"
           >
             <font-awesome-icon :icon="['fas', 'thumbtack']" />
           </checkbox-button>
@@ -131,9 +134,9 @@
         <color-picker v-bind="color" @input="setColor"></color-picker>
 
         <template v-slot:modal-footer="{ ok }">
-          <b-button variant="primary" @click="ok()">
+          <app-button variant="primary" @click="ok()">
             OK
-          </b-button>
+          </app-button>
         </template>
       </b-modal>
 
@@ -147,12 +150,12 @@
         ></codemirror>
 
         <template v-slot:modal-footer="{ ok }">
-          <b-button variant="primary" @click="ok()">
+          <app-button variant="primary" @click="ok()">
             <font-awesome-icon :icon="['fas', 'save']" />Сохранить
-          </b-button>
-          <b-button variant="dark" @click="copySource" ref="copyInBufferBtn">
+          </app-button>
+          <app-button variant="dark" @click="copySource" ref="copyInBufferBtn">
             <font-awesome-icon :icon="['fas', 'clipboard']" />Скопировать
-          </b-button>
+          </app-button>
         </template>
       </b-modal>
     </app-main>

@@ -1,7 +1,11 @@
 import Vue from 'vue';
 import App from './App.vue';
 import CKEditor from '@ckeditor/ckeditor5-vue';
-import BootstrapVue from 'bootstrap-vue';
+// import BootstrapVue from 'bootstrap-vue';
+
+import { ModalPlugin, TooltipPlugin } from 'bootstrap-vue';
+Vue.use(ModalPlugin);
+Vue.use(TooltipPlugin);
 
 import VueCodemirror from 'vue-codemirror';
 import 'codemirror/lib/codemirror.css';
@@ -56,7 +60,7 @@ import './sass/main.sass';
 Vue.config.productionTip = false;
 
 Vue.use(CKEditor);
-Vue.use(BootstrapVue);
+// Vue.use(BootstrapVue);
 Vue.use(VueCodemirror);
 Vue.use(require('vue-moment'), { moment });
 

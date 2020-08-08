@@ -2,7 +2,8 @@
   <button
     @click="$emit('click')"
     type="button"
-    class="btn btn-light"
+    class="btn"
+    :class="btnClass"
   >
     <slot></slot>
   </button>
@@ -10,7 +11,13 @@
 
 <script>
 export default {
-  name: "AppButton"
+  name: "AppButton",
+  props: ['variant'],
+  computed: {
+    btnClass() {
+      return (this.variant) ? 'btn-' + this.variant : ''
+    }
+  }
 }
 </script>
 
