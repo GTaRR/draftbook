@@ -2,10 +2,10 @@
     <label
       class="checkbox-button"
       :class="{ active: value }"
-      :v-b-tooltip="title"
+      v-b-tooltip
+      :title="title"
     >
       <input
-        :title="title"
         type="checkbox"
         autocomplete="off"
         :checked="value"
