@@ -151,10 +151,10 @@
 
         <template v-slot:modal-footer="{ ok }">
           <app-button variant="primary" @click="ok()">
-            <font-awesome-icon :icon="['fas', 'save']" />Сохранить
+            <font-awesome-icon :icon="['fas', 'save']" class="mr-2" />Сохранить
           </app-button>
           <app-button variant="dark" @click="copySource" ref="copyInBufferBtn">
-            <font-awesome-icon :icon="['fas', 'clipboard']" />Скопировать
+            <font-awesome-icon :icon="['fas', 'clipboard']" class="mr-2" />Скопировать
           </app-button>
         </template>
       </b-modal>

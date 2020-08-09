@@ -3,9 +3,10 @@ import App from './App.vue';
 import CKEditor from '@ckeditor/ckeditor5-vue';
 // import BootstrapVue from 'bootstrap-vue';
 
-import { ModalPlugin, TooltipPlugin } from 'bootstrap-vue';
+import { ModalPlugin, VBTooltipPlugin, ToastPlugin } from 'bootstrap-vue';
 Vue.use(ModalPlugin);
-Vue.use(TooltipPlugin);
+Vue.use(VBTooltipPlugin);
+Vue.use(ToastPlugin);
 
 import VueCodemirror from 'vue-codemirror';
 import 'codemirror/lib/codemirror.css';
