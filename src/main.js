@@ -12,6 +12,7 @@ import VueCodemirror from 'vue-codemirror';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/3024-day.css';
 import 'codemirror/mode/xml/xml.js';
+require('codemirror/addon/display/autorefresh.js');
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {

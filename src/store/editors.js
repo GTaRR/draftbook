@@ -1,13 +1,12 @@
 import moment from 'moment';
 require('moment/locale/ru');
 
-export default {
-  state: {
-    editors: [
-      {
-        id: 0,
-        name: 'Первая заметка',
-        data: `
+const state = {
+  editors: [
+    {
+      id: 0,
+      name: 'Первая заметка',
+      data: `
           <h2>Черновик для заметок!</h2>
           <p>Это просто черновик для заметок, который автоматически запоминает данные в <code>LocalStorage</code> браузера, чтобы данные не потерялись ни при закрытии вкладки, ни при закрытии браузера.</p>
           <p>Удобно использовать для написания оценок, инструкций и прочего без создания документа, использования отдельного редактора.</p>
@@ -21,95 +20,115 @@ export default {
               <p>Заголовок заметки сверху является полем ввода.</p>
           </blockquote>
         `,
-        time: {
-          create: moment().format(),
-          open: 0,
-          focus: 0,
-        }
+      time: {
+        create: moment().format(),
+        open: 0,
+        focus: 0,
       }
-    ],
-    activeEditor: 0,
-    tabIndex: 0,
-  },
-  getters: {
-    editors: s => s.editors,
-    activeEditor: s => s.activeEditor,
-    tabIndex: s => s.tabIndex,
-  },
-  mutations: {
-    setTabIndex(state, index) {
-      state.tabIndex = index;
-    },
-    setActiveEditor(state, id) {
-      state.activeEditor = id;
-    },
-    closeTab(state, x) {
-      let isSetActiveEditor = false;
-      for (let editor in state.editors) {
-        if (!({}).hasOwnProperty.call(state.editors, editor))
-          continue;
+    }
+  ],
+  activeEditor: 0,
+  canDataChange: true,
+}
 
-        if (state.activeEditor === x && !isSetActiveEditor && parseInt(editor) !== x) {
-          state.tabIndex = state.activeEditor = parseInt(editor);
-          isSetActiveEditor = true;
-        }
+const getters = {
+  editors: s => s.editors,
+  activeEditor: s => s.activeEditor,
+  canDataChange: s => s.canDataChange,
+}
 
-        if (parseInt(editor) === x) {
-          state.editors.splice(parseInt(editor), 1);
-        }
+const mutations = {
+  setActiveEditor(state, id) {
+    state.activeEditor = id;
+  },
+  setTab(state) {
+    state.canDataChange = false;
+    setTimeout(() => {
+      state.canDataChange = true;
+    }, 1000);
+  },
+  closeTab(state, x) {
+    let isSetActiveEditor = false;
+    for (let editor in state.editors) {
+      if (!({}).hasOwnProperty.call(state.editors, editor))
+        continue;
+
+      if (state.activeEditor === x && !isSetActiveEditor && parseInt(editor) !== x) {
+        state.activeEditor = state.activeEditor = parseInt(editor);
+        isSetActiveEditor = true;
       }
-    },
-    newTab(state) {
-      state.editors.push({
-        id: Date.now(),
-        name: 'Новая заметка',
-        data: 'Текст заметки',
-        time: {
+
+      if (parseInt(editor) === x) {
+        state.editors.splice(parseInt(editor), 1);
+      }
+    }
+  },
+  newTab(state) {
+    state.editors.push({
+      id: Date.now(),
+      name: 'Новая заметка',
+      data: 'Текст заметки',
+      time: {
+        create: moment().format(),
+        open: 0,
+        focus: 0
+      }
+    });
+  },
+  loadEditors(store) {
+    if(localStorage.getItem('multiple_cke_data')) {
+      store.editors = JSON.parse(localStorage.getItem('multiple_cke_data'));
+    }
+
+    // Проверка заполнения времени
+    store.editors.map(item => {
+      if(typeof item.time === 'undefined') {
+        item.time = {
           create: moment().format(),
           open: 0,
           focus: 0
         }
-      });
-    },
-    loadEditors(store) {
-      if(localStorage.getItem('multiple_cke_data')) {
-        store.editors = JSON.parse(localStorage.getItem('multiple_cke_data'));
       }
+    });
 
-      // Проверка заполнения времени
-      store.editors.map(item => {
-        if(typeof item.time === 'undefined') {
-          item.time = {
-            create: moment().format(),
-            open: 0,
-            focus: 0
-          }
-        }
-      });
-
-      store.currentEditor = store.editors[0];
-    },
-    setSourceCodeEditorData(state, data) {
-      state.editors[state.tabIndex].data = data;
-    },
-    setEditors(state, editors) {
-      state.editors = editors;
-    },
-    setEditorProperty(state, {property, value}) {
-      state.editors[state.tabIndex][property] = value;
-    },
+    store.currentEditor = store.editors[0];
   },
-  actions: {
-    closeTab({commit, dispatch}, x) {
-      commit('closeTab', x);
-      dispatch('setLocalStorageEditors');
-    },
-    newTab({commit}) {
-      commit('newTab');
-      localStorage.setItem('multiple_cke_data', JSON.stringify(this.editors));
-    },
-    setLocalStorageEditors({getters}) {
-      localStorage.setItem('multiple_cke_data', JSON.stringify(getters.editors));
+  setSourceCodeEditorData(state, data) {
+    state.editors[state.activeEditor].data = data;
+  },
+  setEditors(state, editors) {
+    state.editors = editors;
+  },
+  setEditorProperty(state, {property, value}) {
+    if (property === 'data' && state.canDataChange) {
+      state.editors[state.activeEditor][property] = value;
+    } else if (property !== 'data') {
+      state.editors[state.activeEditor][property] = value;
     }
+  },
+}
+
+const actions = {
+  setTab({ commit }, id) {
+    commit('setTab', id);
+    commit('setActiveEditor', id);
+  },
+  closeTab({ commit, dispatch }, x) {
+    commit('closeTab', x);
+    dispatch('setLocalStorageEditors');
+  },
+  newTab({ commit, dispatch }) {
+    commit('newTab');
+    dispatch('setLocalStorageEditors');
+  },
+  setLocalStorageEditors({ getters }) {
+    localStorage.setItem('multiple_cke_data', JSON.stringify(getters.editors));
   }
+}
+
+export default {
+  state,
+  getters,
+  mutations,
+  actions
 }

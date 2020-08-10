@@ -4,37 +4,38 @@
       <app-header @toggleSidebar="collapse = !collapse" />
 
       <app-tabs>
-        <draggable
-          :list="editors"
-          class="list-group"
-          ghost-class="ghost"
-          handle=".drag-icon"
-        >
-          <app-tab
-            v-for="(editor, key) in editors"
-            :key="editor.id"
-            :value="tabIndex"
-            @click="clickTab(key)"
-            :editor="editor"
-            :active="(tabIndex === key)"
+        <template v-if="editors.length">
+          <draggable
+            :list="editors"
+            class="list-group"
+            ghost-class="ghost"
+            handle=".drag-icon"
           >
-            <font-awesome-icon :icon="['fas', 'sort']" class="drag-icon" v-if="!collapse" />
-            <span
-              class="tab-title"
-              @dblclick="focusTitle"
-              v-b-tooltip="editor.name"
+            <app-tab
+              v-for="(editor, key) in editors"
+              :key="editor.id"
+              @click="setTab(key)"
+              :editor="editor"
+              :active="(activeEditor === key)"
             >
-              {{ editor.name }}
-            </span>
-            <span
-              v-if="!collapse"
-              class="tab-close"
-              @click="$store.dispatch('closeTab', key)"
-            >
-              <font-awesome-icon :icon="['fas', 'times']" />
-            </span>
-          </app-tab>
-        </draggable>
+              <font-awesome-icon :icon="['fas', 'sort']" class="drag-icon" v-if="!collapse" />
+              <span
+                class="tab-title"
+                @dblclick="focusTitle"
+                v-b-tooltip="editor.name"
+              >
+                {{ editor.name }}
+              </span>
+              <span
+                v-if="!collapse"
+                class="tab-close"
+                @click="$store.dispatch('closeTab', key)"
+              >
+                <font-awesome-icon :icon="['fas', 'times']" />
+              </span>
+            </app-tab>
+          </draggable>
+        </template>
         <div
           @click.prevent="$store.dispatch('newTab')"
           class="tab-item tab-plus"
@@ -99,66 +100,78 @@
       </app-footer-panel>
     </app-sidebar>
 
-    <app-main>
-      <title-input
-        ref="titleInput"
-        :value="currentEditor.name"
-        placeholder="Имя заметки"
-        @input="changeEditorName"
-      ></title-input>
+    <template v-if="editors.length">
+      <app-main>
+        <title-input
+          ref="titleInput"
+          :value="currentEditor.name"
+          placeholder="Имя заметки"
+          @input="changeEditorName"
+        ></title-input>
 
-      <ckeditor
-        :editor="classicEditor"
-        :value="currentEditor.data"
-        :config="{}"
-        @input="changeEditorData"
-        @focus="inFocus = true"
-        @blur="inFocus = false"
-      ></ckeditor>
+        <ckeditor
+          :editor="classicEditor"
+          :value="currentEditor.data"
+          :config="{}"
+          @input="changeEditorData"
+          @focus="inFocus = true"
+          @blur="inFocus = false"
+        ></ckeditor>
 
-      <app-timers
-        :editor="currentEditor"
-        :currentTabTimeDiff="currentTabTimeDiff"
-        :currentTabTimeWhileOpen="currentTabTimeWhileOpen"
-        :currentTabTimeWhileFocus="currentTabTimeWhileFocus"
-      ></app-timers>
+        <app-timers
+          :editor="currentEditor"
+          :currentTabTimeDiff="currentTabTimeDiff"
+          :currentTabTimeWhileOpen="currentTabTimeWhileOpen"
+          :currentTabTimeWhileFocus="currentTabTimeWhileFocus"
+        ></app-timers>
 
-      <b-modal id="settingsModal" size="xl" centered title="Настройки">
-        <h4>Тема</h4>
-        <hr>
-        <theme-list @changeTheme="setTheme" />
+        <b-modal id="settingsModal" size="xl" centered title="Настройки">
+          <h4>Тема</h4>
+          <hr>
+          <theme-list @changeTheme="setTheme" />
 
-        <hr>
-        <h4>Цвет</h4>
-        <hr>
-        <color-picker v-bind="color" @input="setColor"></color-picker>
+          <hr>
+          <h4>Цвет</h4>
+          <hr>
+          <color-picker v-bind="color" @input="setColor"></color-picker>
 
-        <template v-slot:modal-footer="{ ok }">
-          <app-button variant="primary" @click="ok()">
-            OK
-          </app-button>
-        </template>
-      </b-modal>
+          <template v-slot:modal-footer="{ ok }">
+            <app-button variant="primary" @click="ok()">
+              OK
+            </app-button>
+          </template>
+        </b-modal>
 
-      <b-modal id="sourceViewer" size="xl" centered title="Исходный код">
-        <codemirror
-          ref="cmEditor"
-          :value="sourceCodeEditorDataBeautify"
-          :options="cmOptions"
-          @ready="onCmReady"
-          @input="onCmCodeChange"
-        ></codemirror>
+        <b-modal
+          id="sourceViewer"
+          size="xl"
+          centered
+          title="Исходный код"
+          @show="onShowSourceViewer"
+        >
+          <codemirror
+            id="cmEditor"
+            ref="cmEditor"
+            :value="sourceCodeEditorDataBeautify"
+            :options="cmOptions"
+            @input="onCmCodeChange"
+          ></codemirror>
 
-        <template v-slot:modal-footer="{ ok }">
-          <app-button variant="primary" @click="ok()">
-            <font-awesome-icon :icon="['fas', 'save']" class="mr-2" />Сохранить
-          </app-button>
-          <app-button variant="dark" @click="copySource" ref="copyInBufferBtn">
-            <font-awesome-icon :icon="['fas', 'clipboard']" class="mr-2" />Скопировать
-          </app-button>
-        </template>
-      </b-modal>
-    </app-main>
+          <template v-slot:modal-footer="{ ok }">
+            <app-button variant="primary" @click="ok()">
+              <font-awesome-icon :icon="['fas', 'save']" class="mr-2" />Сохранить
+            </app-button>
+            <app-button variant="dark" @click="copySource" ref="copyInBufferBtn">
+              <font-awesome-icon :icon="['fas', 'clipboard']" class="mr-2" />Скопировать
+            </app-button>
+          </template>
+        </b-modal>
+      </app-main>
+    </template>
+
+    <template v-else>
+      <app-main />
+    </template>
   </div>
 </template>
 
@@ -206,6 +219,7 @@ export default {
   data(){
     return {
       classicEditor: ClassicEditor,
+      canSaveData: true,
 
       // options
       fixedSidebar: true,
@@ -234,6 +248,7 @@ export default {
         line: true,
         lineWrapping: false,
         autofocus: true,
+        autoRefresh: true,
       },
     }
   },
@@ -241,19 +256,26 @@ export default {
     ...mapGetters([
       // editors
       'editors',
-      'tabIndex',
+      'activeEditor',
       'activeEditor',
 
       // theme
       'color',
-      'darkMode',
       'coloredMode',
       'customColor',
       'theme',
-      'themes'
+      'themes',
     ]),
     currentEditor() {
       return this.editors[this.activeEditor];
+    },
+    darkMode: {
+      get() {
+        return this.$store.getters.darkMode
+      },
+      set(value) {
+        this.$store.dispatch('setDarkMode', value)
+      }
     }
   },
   created: function(){
@@ -268,7 +290,7 @@ export default {
 
     document.addEventListener('showSourceModal', () => {
       this.sourceCodeEditorDataBeautify = Beautify.html(
-        this.editors[this.tabIndex].data
+        this.editors[this.activeEditor].data
       );
       this.$bvModal.show('sourceViewer');
       this.sourceCodeEditorData = '';
@@ -467,10 +489,10 @@ export default {
           console.error('Произошла ошибка при копировании в буфер', err);
         });
     },
+    onShowSourceViewer() {},
     onCmCodeChange(data) {
       this.sourceCodeEditorData = data;
     },
-    onCmReady() {},
 
     // JSON Experimental
     downloadJSON() {
@@ -486,7 +508,7 @@ export default {
 
     // Editor change handlers
     changeData() {
-      if (!document.hidden) {
+      if (!document.hidden && this.canSaveData) {
         this.$store.dispatch('setLocalStorageEditors');
       }
     },
@@ -495,6 +517,10 @@ export default {
     },
     changeEditorName(value) {
       this.$store.commit('setEditorProperty', {property: 'name', value});
+    },
+
+    setTab(id) {
+      this.$store.dispatch('setTab', id);
     },
 
     focusTitle() {
@@ -510,18 +536,16 @@ export default {
       }, 1000);
     },
 
-    // tabs
-    clickTab(id) {
-      this.$store.commit('setTabIndex', id);
-      this.$store.commit('setActiveEditor', id);
-    },
-
     // timers
     tick() {
-      this.editors[this.tabIndex].time.open += 1000;
+      if (!this.editors.length) return;
+
+      let time = this.editors[this.activeEditor].time;
+      time.open += 1000;
       if (this.inFocus) {
-        this.editors[this.tabIndex].time.focus += 1000;
+        time.focus += 1000;
       }
+      this.$store.commit('setEditorProperty', {property: 'time', value: time});
 
       this.setCurrentTabTimeFromCreate();
       this.setCurrentTabTimeWhileOpen();
@@ -530,18 +554,18 @@ export default {
       this.changeData();
     },
     setCurrentTabTimeFromCreate() {
-      const diffTime = this.$moment().diff(this.editors[this.tabIndex].time.create);
+      const diffTime = this.$moment().diff(this.editors[this.activeEditor].time.create);
       const duration = this.$moment.duration(diffTime);
       const {hours, minutes, seconds} = this.getFormattedTimes(duration);
       this.currentTabTimeDiff = `${hours}:${minutes}:${seconds} назад`;
     },
     setCurrentTabTimeWhileOpen() {
-      const duration = this.$moment.duration(this.editors[this.tabIndex].time.open);
+      const duration = this.$moment.duration(this.editors[this.activeEditor].time.open);
       const {hours, minutes, seconds} = this.getFormattedTimes(duration);
       this.currentTabTimeWhileOpen = `${hours}:${minutes}:${seconds}`;
     },
     setCurrentTabTimeWhileFocus() {
-      const duration = this.$moment.duration(this.editors[this.tabIndex].time.focus);
+      const duration = this.$moment.duration(this.editors[this.activeEditor].time.focus);
       const {hours, minutes, seconds} = this.getFormattedTimes(duration);
       this.currentTabTimeWhileFocus = `${hours}:${minutes}:${seconds}`;
     },
