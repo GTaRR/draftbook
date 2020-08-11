@@ -10,30 +10,33 @@
             class="list-group"
             ghost-class="ghost"
             handle=".drag-icon"
+            @end="dragEnd"
           >
-            <app-tab
-              v-for="(editor, key) in editors"
-              :key="editor.id"
-              @click="setTab(key)"
-              :editor="editor"
-              :active="(activeEditor === key)"
-            >
-              <font-awesome-icon :icon="['fas', 'sort']" class="drag-icon" v-if="!collapse" />
-              <span
-                class="tab-title"
-                @dblclick="focusTitle"
-                v-b-tooltip="editor.name"
+            <transition-group>
+              <app-tab
+                v-for="(editor, key) in editors"
+                :key="editor.id"
+                @click="setTab(key)"
+                :editor="editor"
+                :active="(activeEditor === key)"
               >
-                {{ editor.name }}
-              </span>
-              <span
-                v-if="!collapse"
-                class="tab-close"
-                @click="$store.dispatch('closeTab', key)"
-              >
-                <font-awesome-icon :icon="['fas', 'times']" />
-              </span>
-            </app-tab>
+                <font-awesome-icon :icon="['fas', 'sort']" class="drag-icon" v-if="!collapse" />
+                <span
+                  class="tab-title"
+                  @dblclick="focusTitle"
+                  v-b-tooltip="editor.name"
+                >
+                  {{ editor.name }}
+                </span>
+                <span
+                  v-if="!collapse"
+                  class="tab-close"
+                  @click="$store.dispatch('closeTab', key)"
+                >
+                  <font-awesome-icon :icon="['fas', 'times']" />
+                </span>
+              </app-tab>
+            </transition-group>
           </draggable>
         </template>
         <div
@@ -59,7 +62,6 @@
             v-model="darkMode"
             @input="darkModeChange"
             title="Темная тема"
-            v-if="!collapse"
           >
             <font-awesome-icon :icon="['fas', 'moon']" />
           </checkbox-button>
@@ -88,14 +90,6 @@
             accept="application/json"
             ref="fileInput"
           />
-
-          <checkbox-button
-            title="Фиксирование сайдбара"
-            v-model="fixedSidebar"
-            class="fixed-btn"
-          >
-            <font-awesome-icon :icon="['fas', 'thumbtack']" />
-          </checkbox-button>
         </buttons-group>
       </app-footer-panel>
     </app-sidebar>
@@ -147,7 +141,6 @@
           size="xl"
           centered
           title="Исходный код"
-          @show="onShowSourceViewer"
         >
           <codemirror
             id="cmEditor"
@@ -219,7 +212,6 @@ export default {
   data(){
     return {
       classicEditor: ClassicEditor,
-      canSaveData: true,
 
       // options
       fixedSidebar: true,
@@ -256,7 +248,6 @@ export default {
     ...mapGetters([
       // editors
       'editors',
-      'activeEditor',
       'activeEditor',
 
       // theme
@@ -305,7 +296,7 @@ export default {
       }
     });
 
-    // импорт JSON
+    // import JSON
     this.$refs.fileInput.addEventListener('change', function () {
       if (!(this.files && this.files.length > 0)) return;
 
@@ -314,11 +305,18 @@ export default {
 
       reader.readAsText(file);
 
-      reader.onload = function() {
+      reader.onload = () => {
         vm.$store.commit('setEditors', JSON.parse(reader.result));
       };
 
-      reader.onerror = function() {
+      reader.onerror = () => {
+        this.$bvToast.toast(`Произошла ошибка при импорте JSON`, {
+          title: 'Ошибка',
+          autoHideDelay: 2000,
+          appendToast: true,
+          variant: 'danger',
+          toaster: 'b-toaster-top-center'
+        });
         console.log(reader.error);
       };
     });
@@ -489,14 +487,13 @@ export default {
           console.error('Произошла ошибка при копировании в буфер', err);
         });
     },
-    onShowSourceViewer() {},
     onCmCodeChange(data) {
       this.sourceCodeEditorData = data;
     },
 
     // JSON Experimental
     downloadJSON() {
-      let blob = new Blob([JSON.stringify(this.editors)], {type : 'application/json'});
+      let blob = new Blob([JSON.stringify(this.editors, null, '\t')], {type : 'application/json'});
       let link = document.createElement('a');
       link.href = window.URL.createObjectURL(blob);
       link.download = 'draft.json';
@@ -508,7 +505,7 @@ export default {
 
     // Editor change handlers
     changeData() {
-      if (!document.hidden && this.canSaveData) {
+      if (!document.hidden) {
         this.$store.dispatch('setLocalStorageEditors');
       }
     },
@@ -521,6 +518,12 @@ export default {
 
     setTab(id) {
       this.$store.dispatch('setTab', id);
+    },
+    dragEnd(e) {
+      this.$store.dispatch('setTab', e.newIndex);
+      setTimeout(() => {
+        this.$forceUpdate();
+      }, 500);
     },
 
     focusTitle() {
@@ -540,7 +543,7 @@ export default {
     tick() {
       if (!this.editors.length) return;
 
-      let time = this.editors[this.activeEditor].time;
+      let time = this.currentEditor.time;
       time.open += 1000;
       if (this.inFocus) {
         time.focus += 1000;
@@ -554,18 +557,18 @@ export default {
       this.changeData();
     },
     setCurrentTabTimeFromCreate() {
-      const diffTime = this.$moment().diff(this.editors[this.activeEditor].time.create);
+      const diffTime = this.$moment().diff(this.currentEditor.time.create);
       const duration = this.$moment.duration(diffTime);
       const {hours, minutes, seconds} = this.getFormattedTimes(duration);
       this.currentTabTimeDiff = `${hours}:${minutes}:${seconds} назад`;
     },
     setCurrentTabTimeWhileOpen() {
-      const duration = this.$moment.duration(this.editors[this.activeEditor].time.open);
+      const duration = this.$moment.duration(this.currentEditor.time.open);
       const {hours, minutes, seconds} = this.getFormattedTimes(duration);
       this.currentTabTimeWhileOpen = `${hours}:${minutes}:${seconds}`;
     },
     setCurrentTabTimeWhileFocus() {
-      const duration = this.$moment.duration(this.editors[this.activeEditor].time.focus);
+      const duration = this.$moment.duration(this.currentEditor.time.focus);
       const {hours, minutes, seconds} = this.getFormattedTimes(duration);
       this.currentTabTimeWhileFocus = `${hours}:${minutes}:${seconds}`;
     },

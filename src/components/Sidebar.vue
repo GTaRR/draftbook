@@ -6,10 +6,7 @@
 
 <script>
   export default {
-    name: "Sidebar",
-    methods: {
-
-    }
+    name: "Sidebar"
   }
 </script>
 
@@ -23,7 +20,7 @@
     width: 256px
     max-width: 256px
     padding: 0
-    position: relative
+    position: fixed
     z-index: 1
     overflow: hidden
     box-shadow: 0 0 15px -5px rgba(0,0,0,.2)

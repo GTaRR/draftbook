@@ -5,8 +5,8 @@
       <span
         class="timers__time"
         v-b-tooltip.hover
-        :title="editor.time.create | moment('Do MMMM YYYY, H:mm:ss')"
-      >{{ currentTabTimeDiff }}</span>
+        :title="currentTabTimeDiff"
+      >{{ editor.time.create | moment('Do MMMM YYYY, H:mm:ss') }}</span>
     </span>
     <span class="timers__item">
       <span class="timers__label">Заметка открыта:</span>
@@ -31,7 +31,7 @@
     display: flex
     align-items: center
     flex-wrap: wrap
-    margin-top: 1rem
+    margin: 1rem 0
     &__item:not(:last-child)
       margin-right: 1rem
     &__label

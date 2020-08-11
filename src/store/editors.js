@@ -1,6 +1,9 @@
 import moment from 'moment';
 require('moment/locale/ru');
 
+import debounce from 'lodash/debounce';
+const setCanDataChange = debounce(state => { state.canDataChange = true; }, 1000);
+
 const state = {
   editors: [
     {
@@ -43,9 +46,7 @@ const mutations = {
   },
   setTab(state) {
     state.canDataChange = false;
-    setTimeout(() => {
-      state.canDataChange = true;
-    }, 1000);
+    setCanDataChange(state);
   },
   closeTab(state, x) {
     let isSetActiveEditor = false;
@@ -53,7 +54,7 @@ const mutations = {
       if (!({}).hasOwnProperty.call(state.editors, editor))
         continue;
 
-      if (state.activeEditor === x && !isSetActiveEditor && parseInt(editor) !== x) {
+      if (state.activeEditor === x && !isSetActiveEditor) {
         state.activeEditor = state.activeEditor = parseInt(editor);
         isSetActiveEditor = true;
       }
@@ -77,7 +78,9 @@ const mutations = {
   },
   loadEditors(store) {
     if(localStorage.getItem('multiple_cke_data')) {
-      store.editors = JSON.parse(localStorage.getItem('multiple_cke_data'));
+      store.editors = JSON.parse(
+        localStorage.getItem('multiple_cke_data')
+      );
     }
 
     // Проверка заполнения времени
@@ -100,11 +103,9 @@ const mutations = {
     state.editors = editors;
   },
   setEditorProperty(state, {property, value}) {
-    if (property === 'data' && state.canDataChange) {
-      state.editors[state.activeEditor][property] = value;
-    } else if (property !== 'data') {
-      state.editors[state.activeEditor][property] = value;
-    }
+    if (property === 'data' && !state.canDataChange) return;
+
+    state.editors[state.activeEditor][property] = value;
   },
 }
 
@@ -122,8 +123,12 @@ const actions = {
     dispatch('setLocalStorageEditors');
   },
   setLocalStorageEditors({ getters }) {
-    localStorage.setItem('multiple_cke_data', JSON.stringify(getters.editors));
-  }
+    localStorage.setItem(
+      'multiple_cke_data',
+      JSON.stringify(getters.editors, null, '\t')
+    );
+  },
+
 }
 
 export default {

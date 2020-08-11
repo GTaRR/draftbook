@@ -1,7 +1,8 @@
 import Vue from 'vue';
 import App from './App.vue';
+
 import CKEditor from '@ckeditor/ckeditor5-vue';
-// import BootstrapVue from 'bootstrap-vue';
+Vue.use(CKEditor);
 
 import { ModalPlugin, VBTooltipPlugin, ToastPlugin } from 'bootstrap-vue';
 Vue.use(ModalPlugin);
@@ -13,6 +14,7 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/3024-day.css';
 import 'codemirror/mode/xml/xml.js';
 require('codemirror/addon/display/autorefresh.js');
+Vue.use(VueCodemirror);
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
@@ -61,9 +63,6 @@ import './sass/main.sass';
 
 Vue.config.productionTip = false;
 
-Vue.use(CKEditor);
-// Vue.use(BootstrapVue);
-Vue.use(VueCodemirror);
 Vue.use(require('vue-moment'), { moment });
 
 new Vue({
