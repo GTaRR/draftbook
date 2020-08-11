@@ -29,4 +29,7 @@
       padding-top: 3rem
     .sidebar--collapse + &
       margin-left: 72px
+  @media (max-width: 767px)
+    .main
+      margin-left: 0 !important
 </style>
