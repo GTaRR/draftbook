@@ -1,6 +1,6 @@
 const state = {
   color: {
-    hue: 163,
+    hue: 212,
     saturation: 38,
     luminosity: 62,
     alpha: 1
