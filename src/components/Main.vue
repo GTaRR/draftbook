@@ -19,7 +19,7 @@
   .main
     display: flex
     flex-direction: column
-    padding: 0 1.125rem 1.125rem
+    padding: 0 1.125rem
     flex: 1 1 auto
     margin-left: 256px
     transition: margin-left .6s ease-in-out
