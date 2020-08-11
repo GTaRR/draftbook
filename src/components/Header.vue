@@ -76,4 +76,5 @@
       text-transform: uppercase
       color: #fff
       font-size: 1.25rem
+      user-select: none
 </style>
