@@ -29,6 +29,7 @@
     cursor: pointer
     transition: all .3s,width .6s ease-in-out
     outline: none
+    position: relative
     //&:not(:last-child)
       border-bottom: 1px solid var(--light-hover)
     &:hover
@@ -61,12 +62,16 @@
       white-space: nowrap
       overflow: hidden
       line-height: 1.95rem
-      margin-left: .5rem
+      margin-left: 1rem
       user-select: none
     .drag-icon
       opacity: 0
       cursor: grab
       transition: opacity .3s
+      position: absolute
+      top: 50%
+      left: .5rem
+      transform: translateY(-50%)
 
   .tab-plus
     justify-content: center
