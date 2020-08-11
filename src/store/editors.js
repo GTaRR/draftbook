@@ -10,18 +10,24 @@ const state = {
       id: 0,
       name: 'Первая заметка',
       data: `
-          <h2>Черновик для заметок!</h2>
-          <p>Это просто черновик для заметок, который автоматически запоминает данные в <code>LocalStorage</code> браузера, чтобы данные не потерялись ни при закрытии вкладки, ни при закрытии браузера.</p>
-          <p>Удобно использовать для написания оценок, инструкций и прочего без создания документа, использования отдельного редактора.</p>
-          <p>Запоминаются все вкладки. При очистке кеша всего браузера стираются и эти заметки из <code>LocalStorage</code>.</p>
+          <h2><strong>D R A F T B O O K</strong></h2>
+          <h4><strong>Черновик для заметок</strong></h4>
+          <ul class="todo-list">
+              <li><label class="todo-list__label"><input type="checkbox" disabled="disabled" checked="checked"><span class="todo-list__label__description">Автоматически запоминает данные в </span></label><code><label class="todo-list__label"><span class="todo-list__label__description">LocalStorage</span></label></code><label class="todo-list__label"><span class="todo-list__label__description"> браузера.</span></label></li>
+              <li><label class="todo-list__label"><input type="checkbox" disabled="disabled" checked="checked"><span class="todo-list__label__description">Данные не потеряются ни при закрытии вкладки, ни при закрытии браузера.</span></label></li>
+              <li><label class="todo-list__label"><input type="checkbox" disabled="disabled" checked="checked"><span class="todo-list__label__description">Запоминаются все вкладки.</span></label></li>
+              <li><label class="todo-list__label"><input type="checkbox" disabled="disabled" checked="checked"><span class="todo-list__label__description">Есть тёмная тема.</span></label></li>
+              <li><label class="todo-list__label"><input type="checkbox" disabled="disabled" checked="checked"><span class="todo-list__label__description">Есть настройки цветовой схемы.</span></label></li>
+          </ul>
           <blockquote>
-              <p><strong>Как создать новую вкладку?&nbsp;</strong></p>
+              <p><strong>Как создать новую вкладку?</strong></p>
               <p>Нажмите <code>+</code> в боковой панели.</p>
           </blockquote>
           <blockquote>
-              <p><strong>Как переименовать вкладку?&nbsp;</strong></p>
-              <p>Заголовок заметки сверху является полем ввода.</p>
+              <p><strong>Как переименовать вкладку?</strong></p>
+              <p>Заголовок заметки сверху является текстовым полем ввода.</p>
           </blockquote>
+          <p><strong>Внимание, при очистке кеша всего браузера стираются и эти заметки из </strong><code><strong>LocalStorage</strong></code><strong>.</strong></p>
         `,
       time: {
         create: moment().format(),
