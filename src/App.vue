@@ -235,7 +235,7 @@ export default {
         mode: 'xml',
         htmlMode: true,
         matchClosing: true,
-        theme: 'darcula',
+        theme: 'idea',
         lineNumbers: true,
         line: true,
         lineWrapping: false,
@@ -352,8 +352,6 @@ export default {
         this.setTheme('colored');
       }
 
-      this.cmOptions.theme = (dark) ? 'darcula' : 'idea';
-
       if (this.customColor) {
         this.setColor(this.color.hue);
       }
@@ -437,6 +435,8 @@ export default {
 
         document.documentElement.style.setProperty(cssVar, value);
       }
+
+      this.cmOptions.theme = (dark) ? 'darcula' : 'idea';
 
       this.$store.dispatch('setTheme', name);
     },
