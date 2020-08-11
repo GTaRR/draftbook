@@ -235,7 +235,7 @@ export default {
         mode: 'xml',
         htmlMode: true,
         matchClosing: true,
-        theme: '3024-day',
+        theme: 'darcula',
         lineNumbers: true,
         line: true,
         lineWrapping: false,
@@ -351,6 +351,8 @@ export default {
       if (colored && !dark) {
         this.setTheme('colored');
       }
+
+      this.cmOptions.theme = (dark) ? 'darcula' : 'idea';
 
       if (this.customColor) {
         this.setColor(this.color.hue);

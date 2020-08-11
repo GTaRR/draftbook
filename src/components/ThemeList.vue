@@ -82,8 +82,6 @@
 <style lang="sass">
   .theme-list
     display: flex
-    body.dark &
-      filter: invert(1)
   .theme-item
     & + &
       margin-left: 16px
@@ -122,12 +120,8 @@
       background-color: #202020
 
   body.dark
-    .theme-list
-      filter: invert(1)
     .theme-wrapper
       outline: 1px solid #202020
-    .rcp
-      filter: invert(1)
     .theme-item__title
       color: var(--gray-700)
 

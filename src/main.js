@@ -11,7 +11,8 @@ Vue.use(ToastPlugin);
 
 import VueCodemirror from 'vue-codemirror';
 import 'codemirror/lib/codemirror.css';
-import 'codemirror/theme/3024-day.css';
+import 'codemirror/theme/darcula.css';
+import 'codemirror/theme/idea.css';
 import 'codemirror/mode/xml/xml.js';
 require('codemirror/addon/display/autorefresh.js');
 Vue.use(VueCodemirror);
