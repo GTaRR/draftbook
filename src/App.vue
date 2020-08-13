@@ -65,31 +65,6 @@
           >
             <font-awesome-icon :icon="['fas', 'moon']" />
           </checkbox-button>
-
-          <app-button
-            v-b-tooltip="'Экспорт в JSON'"
-            variant="light"
-            v-if="!collapse && 0"
-            @click="downloadJSON"
-          >
-            <font-awesome-icon :icon="['fas', 'download']" />
-          </app-button>
-
-          <app-button
-            v-b-tooltip="'Импорт из JSON'"
-            variant="light"
-            v-if="!collapse && 0"
-            @click="uploadJSON"
-          >
-            <font-awesome-icon :icon="['fas', 'upload']" />
-          </app-button>
-
-          <input
-            style="display: none;"
-            type="file"
-            accept="application/json"
-            ref="fileInput"
-          />
         </buttons-group>
       </app-footer-panel>
     </app-sidebar>
@@ -122,11 +97,13 @@
         <b-modal id="settingsModal" size="xl" centered title="Настройки">
           <h4>Тема</h4>
           <hr>
-          <theme-list @changeTheme="setTheme" />
 
+          <theme-list @changeTheme="setTheme" />
           <hr>
+
           <h4>Цвет</h4>
           <hr>
+
           <color-picker v-bind="color" @input="setColor"></color-picker>
 
           <template v-slot:modal-footer="{ ok }">
@@ -169,11 +146,10 @@
 </template>
 
 <script>
+import ClassicEditor from './ckeditor';
 import Beautify from 'js-beautify';
 import ColorPicker from '@radial-color-picker/vue-color-picker';
-import { mapGetters } from 'vuex';
-
-import ClassicEditor from './ckeditor';
+import Draggable from 'vuedraggable';
 
 import AppSidebar from './components/Sidebar';
 import AppHeader from './components/Header';
@@ -189,7 +165,7 @@ import ButtonsGroup from './components/buttons/ButtonsGroup'
 import AppButton from './components/buttons/AppButton'
 import CheckboxButton from "@/components/buttons/CheckboxButton";
 
-import Draggable from 'vuedraggable';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'app',
@@ -214,11 +190,7 @@ export default {
       classicEditor: ClassicEditor,
 
       // options
-      fixedSidebar: true,
       collapse: false,
-
-      // import/export data
-      jsonFile: null,
 
       // timers
       interval: null,
@@ -273,8 +245,6 @@ export default {
     this.$store.commit('loadEditors');
   },
   mounted(){
-    let vm = this;
-
     this.interval = setInterval(() => {
       this.tick();
     }, 1000);
@@ -294,31 +264,6 @@ export default {
           this.sourceCodeEditorData
         );
       }
-    });
-
-    // import JSON
-    this.$refs.fileInput.addEventListener('change', function () {
-      if (!(this.files && this.files.length > 0)) return;
-
-      const file = this.files[0];
-      const reader = new FileReader();
-
-      reader.readAsText(file);
-
-      reader.onload = () => {
-        vm.$store.commit('setEditors', JSON.parse(reader.result));
-      };
-
-      reader.onerror = () => {
-        this.$bvToast.toast(`Произошла ошибка при импорте JSON`, {
-          title: 'Ошибка',
-          autoHideDelay: 2000,
-          appendToast: true,
-          variant: 'danger',
-          toaster: 'b-toaster-top-center'
-        });
-        console.log(reader.error);
-      };
     });
 
     this.initTheme();
@@ -361,7 +306,7 @@ export default {
       this.setTheme(this.theme);
     },
     setTheme(name) {
-      const theme = this.themes.filter(theme => theme.name === name)[0];
+      const theme = this.themes.find(theme => theme.name === name);
       if (!theme) return;
 
       let {
@@ -493,18 +438,6 @@ export default {
       this.sourceCodeEditorData = data;
     },
 
-    // JSON Experimental
-    downloadJSON() {
-      let blob = new Blob([JSON.stringify(this.editors, null, '\t')], {type : 'application/json'});
-      let link = document.createElement('a');
-      link.href = window.URL.createObjectURL(blob);
-      link.download = 'draft.json';
-      link.click();
-    },
-    uploadJSON() {
-      this.$refs.fileInput.click();
-    },
-
     // Editor change handlers
     changeData() {
       if (!document.hidden) {
@@ -545,11 +478,9 @@ export default {
     tick() {
       if (!this.editors.length) return;
 
-      let time = this.currentEditor.time;
+      let time = Object.assign({}, this.currentEditor.time);
       time.open += 1000;
-      if (this.inFocus) {
-        time.focus += 1000;
-      }
+      if (this.inFocus) time.focus += 1000;
       this.$store.commit('setEditorProperty', {property: 'time', value: time});
 
       this.setCurrentTabTimeFromCreate();
