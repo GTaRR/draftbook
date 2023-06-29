@@ -1,0 +1,16 @@
+.ck-editor__editable_inline {  //min-height: 84vh
+  min-height: calc(100vh - (128px) - 3.125rem); // 100vh - шапка - отступ внизу
+
+  @media (max-width: 957px) {
+    min-height: calc(100vh - (128px + 25px) - 3.125rem); // 100vh - шапка - отступ внизу
+  }
+}
+.ck.ck-editor__main > .ck-editor__editable {
+  transition: border-color .2s;
+}
+.ck.ck-editor__main > .ck-editor__editable.ck-focused {
+  border-color: var(--primary) !important;
+}
+.ck-toolbar__items {
+  flex-wrap: wrap !important;
+}

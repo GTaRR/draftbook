@@ -34,7 +34,7 @@ import SourceView from './plugins/sourceview';
 
 import '@ckeditor/ckeditor5-build-classic/build/translations/ru';
 
-import '@/sass/ckeditor_overrides.sass';
+import '@/sass/ckeditor_overrides.scss';
 
 export default class ClassicEditor extends ClassicEditorBase {}
 

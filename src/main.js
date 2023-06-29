@@ -28,7 +28,7 @@ Vue.component('font-awesome-icon', FontAwesomeIcon);
 import moment from 'moment';
 require('moment/locale/ru');
 
-import './sass/main.sass';
+import './sass/main.scss';
 
 import { createPinia, PiniaVuePlugin } from 'pinia';
 

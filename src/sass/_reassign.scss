@@ -1,0 +1,56 @@
+.card,
+.tabs,
+.tab-pane {
+  height: 100%;
+}
+body {
+  background-color: var(--background);
+}
+.card {
+  border: none;
+  background-color: var(--background);
+  &-body {
+    padding: 0 1.125rem 1.125rem;
+  }
+  &-header {
+    padding: 0;
+    max-width: 256px;
+    width: 256px;
+    background-color: var(--background);
+    box-shadow: 0 0 15px -5px rgba(0,0,0,.2);
+    transition: width .6s ease-in-out;
+    z-index: 1;
+    position: relative;
+    overflow: hidden;
+    flex-wrap: nowrap;
+  }
+}
+.tabs {
+  flex-wrap: nowrap;
+}
+.tab-content {
+  background-color: var(--background);
+  flex-shrink: 1;
+}
+.modal-content {
+  border-radius: 0;
+  border: none;
+}
+.form-control {
+  border-left: none;
+  border-top: none;
+  border-right: none;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, color 0.15s ease-in-out;
+  color: var(--primary);
+  background-color: var(--background);
+  border-color: var(--gray-400);
+  .card-text &:focus {
+    color: var(--gray-700);
+    border-color: var(--gray-500);
+    background-color: var(--background);
+  }
+}
+.cm-tag {
+  font-style: normal !important;
+  font-weight: 500;
+}
