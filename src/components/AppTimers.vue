@@ -20,28 +20,44 @@
 </template>
 
 <script>
-  export default {
-    name: "Timers",
-    props: ['editor', 'currentTabTimeDiff', 'currentTabTimeWhileOpen', 'currentTabTimeWhileFocus']
-  }
+import moment from 'moment';
+
+export default {
+  data() {
+    return { moment };
+  },
+  props: {
+    editor: Object,
+    currentTabTimeDiff: String,
+    currentTabTimeWhileOpen: String,
+    currentTabTimeWhileFocus: String,
+  },
+}
 </script>
 
-<style scoped lang="sass">
-  .timers
-    display: flex
-    align-items: center
-    flex-wrap: wrap
-    margin: 1rem 0
-    &__item:not(:last-child)
-      margin-right: 1rem
-    &__label
-      color: var(--gray-800)
-      margin-right: .5rem
-    &__time
-      color: var(--primary)
-      margin-right: .5rem
-  @media (max-width: 767px)
-    .timers
-      flex-direction: column
-      align-items: flex-start
+<style scoped lang="scss">
+.timers {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+
+  &__item:not(:last-child) {
+    margin-right: 1rem;
+  }
+  &__label {
+    color: var(--gray-800);
+    margin-right: .5rem;
+  }
+  &__time {
+    color: var(--primary);
+    margin-right: .5rem;
+  }
+  @media (max-width: 767px) {
+    .timers {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+}
 </style>

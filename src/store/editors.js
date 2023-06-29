@@ -1,15 +1,18 @@
-import moment from 'moment';
-require('moment/locale/ru');
-
+import { defineStore } from 'pinia';
 import debounce from 'lodash/debounce';
+import moment from 'moment';
+
+import 'moment/locale/ru';
+
 const setCanDataChange = debounce(state => { state.canDataChange = true; }, 1000);
 
-const state = {
-  editors: [
-    {
-      id: 0,
-      name: 'Первая заметка',
-      data: `
+export const useEditorsStore = defineStore('editors', {
+  state: () => ({
+    editors: [
+      {
+        id: 0,
+        name: 'Первая заметка',
+        data: `
           <h2><strong>D R A F T B O O K</strong></h2>
           <h4><strong>Черновик для заметок</strong></h4>
           <ul class="todo-list">
@@ -29,117 +32,89 @@ const state = {
           </blockquote>
           <p><strong>Внимание, при очистке кеша всего браузера стираются и эти заметки из </strong><code><strong>LocalStorage</strong></code><strong>.</strong></p>
         `,
-      time: {
-        create: moment().format(),
-        open: 0,
-        focus: 0,
+        time: {
+          create: moment().format(),
+          open: 0,
+          focus: 0,
+        }
       }
-    }
-  ],
-  activeEditor: 0,
-  canDataChange: true,
-}
+    ],
+    activeEditor: 0,
+    canDataChange: true,
+  }),
+  actions: {
+    setTab(id) {
+      this.canDataChange = false;
+      setCanDataChange(this);
+      this.activeEditor = id;
+    },
+    closeTab(x) {
+      let isSetActiveEditor = false;
+      for (let editor in this.editors) {
+        if (!({}).hasOwnProperty.call(this.editors, editor))
+          continue;
 
-const getters = {
-  editors: s => s.editors,
-  activeEditor: s => s.activeEditor,
-  canDataChange: s => s.canDataChange,
-}
+        if (this.activeEditor === x && !isSetActiveEditor) {
+          this.activeEditor = this.activeEditor = parseInt(editor);
+          isSetActiveEditor = true;
+        }
 
-const mutations = {
-  setActiveEditor(state, id) {
-    state.activeEditor = id;
-  },
-  setTab(state) {
-    state.canDataChange = false;
-    setCanDataChange(state);
-  },
-  closeTab(state, x) {
-    let isSetActiveEditor = false;
-    for (let editor in state.editors) {
-      if (!({}).hasOwnProperty.call(state.editors, editor))
-        continue;
-
-      if (state.activeEditor === x && !isSetActiveEditor) {
-        state.activeEditor = state.activeEditor = parseInt(editor);
-        isSetActiveEditor = true;
+        if (parseInt(editor) === x) {
+          this.editors.splice(parseInt(editor), 1);
+        }
       }
-
-      if (parseInt(editor) === x) {
-        state.editors.splice(parseInt(editor), 1);
-      }
-    }
-  },
-  newTab(state) {
-    state.editors.push({
-      id: Date.now(),
-      name: 'Новая заметка',
-      data: 'Текст заметки',
-      time: {
-        create: moment().format(),
-        open: 0,
-        focus: 0
-      }
-    });
-  },
-  loadEditors(store) {
-    if(localStorage.getItem('multiple_cke_data')) {
-      store.editors = JSON.parse(
-        localStorage.getItem('multiple_cke_data')
-      );
-    }
-
-    // Проверка заполнения времени
-    store.editors.map(item => {
-      if(typeof item.time === 'undefined') {
-        item.time = {
+      this.setLocalStorageEditors();
+    },
+    newTab() {
+      this.editors.push({
+        id: Date.now(),
+        name: 'Новая заметка',
+        data: 'Текст заметки',
+        time: {
           create: moment().format(),
           open: 0,
           focus: 0
         }
+      });
+
+      this.setLocalStorageEditors();
+    },
+    setLocalStorageEditors() {
+      localStorage.setItem(
+        'multiple_cke_data',
+        JSON.stringify(this.editors, null, '\t')
+      );
+    },
+    loadEditors() {
+      if(localStorage.getItem('multiple_cke_data')) {
+        this.editors = JSON.parse(
+          localStorage.getItem('multiple_cke_data')
+        );
       }
-    });
 
-    store.currentEditor = store.editors[0];
-  },
-  setSourceCodeEditorData(state, data) {
-    state.editors[state.activeEditor].data = data;
-  },
-  setEditors(state, editors) {
-    state.editors = editors;
-  },
-  setEditorProperty(state, {property, value}) {
-    if (property === 'data' && !state.canDataChange) return;
+      // Проверка заполнения времени
+      this.editors.map(item => {
+        if(typeof item.time === 'undefined') {
+          item.time = {
+            create: moment().format(),
+            open: 0,
+            focus: 0
+          }
+        }
+      });
 
-    state.editors[state.activeEditor][property] = value;
-  },
-}
+      this.currentEditor = this.editors[0];
+    },
+    setSourceCodeEditorData(data) {
+      this.editors[this.activeEditor].data = data;
+    },
+    setEditors(editors) {
+      this.editors = editors;
+    },
+    setEditorProperty({ property, value }) {
+      if (property === 'data' && !this.canDataChange) return;
 
-const actions = {
-  setTab({ commit }, id) {
-    commit('setTab', id);
-    commit('setActiveEditor', id);
+      this.editors[this.activeEditor][property] = value;
+    },
   },
-  closeTab({ commit, dispatch }, x) {
-    commit('closeTab', x);
-    dispatch('setLocalStorageEditors');
-  },
-  newTab({ commit, dispatch }) {
-    commit('newTab');
-    dispatch('setLocalStorageEditors');
-  },
-  setLocalStorageEditors({ getters }) {
-    localStorage.setItem(
-      'multiple_cke_data',
-      JSON.stringify(getters.editors, null, '\t')
-    );
-  },
-
-}
-
-export default {
-  state,
-  getters,
-  mutations,
-  actions
-}
+});

@@ -4,13 +4,8 @@
   </div>
 </template>
 
-<script>
-  export default {
-    name: "FooterPanel"
-  }
-</script>
-
-<style lang="sass">
-  .footer-panel
-    margin-top: auto
+<style lang="scss">
+.footer-panel {
+  margin-top: auto;
+}
 </style>

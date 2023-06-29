@@ -9,18 +9,14 @@
   </button>
 </template>
 
-<script>
-export default {
-  name: "AppButton",
-  props: ['variant'],
-  computed: {
-    btnClass() {
-      return (this.variant) ? 'btn-' + this.variant : ''
-    }
-  }
-}
+<script setup>
+import { defineProps, computed } from 'vue';
+
+const props = defineProps({
+  variant: String,
+});
+
+const btnClass = computed(() => {
+  return (props.variant) ? 'btn-' + props.variant : '';
+});
 </script>
-
-<style lang="sass">
-
-</style>

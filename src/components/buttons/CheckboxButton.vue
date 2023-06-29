@@ -15,18 +15,22 @@
     </label>
 </template>
 
-<script>
-export default {
-  name: "CheckboxButton",
-  props: ['title', 'value']
-}
+<script setup>
+import { defineProps } from 'vue';
+
+defineProps({
+  title: String,
+  value: Boolean,
+});
 </script>
 
-<style scoped lang="sass">
-  label.checkbox-button
-    margin-bottom: 0
-  input
-    position: absolute
-    clip: rect(0,0,0,0)
-    pointer-events: none
+<style scoped lang="scss">
+label.checkbox-button {
+  margin-bottom: 0;
+}
+input {
+  position: absolute;
+  clip: rect(0, 0, 0, 0);
+  pointer-events: none;
+}
 </style>
