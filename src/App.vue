@@ -31,7 +31,7 @@
                 <span
                     v-if="!collapse"
                     class="tab-close"
-                    @click="$store.dispatch('closeTab', key)"
+                    @click="editorsStore.closeTab(key)"
                 >
                   <font-awesome-icon :icon="['fas', 'xmark']" />
                 </span>
@@ -40,7 +40,7 @@
           </draggable>
         </template>
         <div
-            @click.prevent="$store.dispatch('newTab')"
+            @click.prevent="editorsStore.newTab()"
             class="tab-item tab-plus"
         >
           <font-awesome-icon :icon="['fas', 'plus']" />
