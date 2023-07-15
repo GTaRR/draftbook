@@ -4,9 +4,8 @@
       <span class="timers__label">Заметка создана:</span>
       <span
         class="timers__time"
-        v-b-tooltip.hover
-        :title="currentTabTimeDiff"
-      >{{ editor.time.create | moment('Do MMMM YYYY, H:mm:ss') }}</span>
+        v-tooltip.hover="currentTabTimeDiff"
+      >{{ formatData(editor.time.create) }}</span>
     </span>
     <span class="timers__item">
       <span class="timers__label">Заметка открыта:</span>
@@ -19,19 +18,19 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { defineProps } from 'vue';
 import moment from 'moment';
+import 'moment/locale/ru';
 
-export default {
-  data() {
-    return { moment };
-  },
-  props: {
-    editor: Object,
-    currentTabTimeDiff: String,
-    currentTabTimeWhileOpen: String,
-    currentTabTimeWhileFocus: String,
-  },
+defineProps({
+  editor: Object,
+  currentTabTimeDiff: String,
+  currentTabTimeWhileOpen: String,
+  currentTabTimeWhileFocus: String,
+});
+function formatData(date) {
+  return moment(date).format('Do MMMM YYYY, H:mm:ss');
 }
 </script>
 

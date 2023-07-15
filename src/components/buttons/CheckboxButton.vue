@@ -2,8 +2,7 @@
     <label
       class="checkbox-button btn btn-light"
       :class="{ active: value }"
-      v-b-tooltip
-      :title="title"
+      v-tooltip="title"
     >
       <input
         type="checkbox"
@@ -16,12 +15,13 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps, defineEmits } from 'vue';
 
 defineProps({
   title: String,
   value: Boolean,
 });
+defineEmits(['input']);
 </script>
 
 <style scoped lang="scss">

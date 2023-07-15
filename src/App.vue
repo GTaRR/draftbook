@@ -1,47 +1,57 @@
 <template>
   <div id="app">
-    <app-sidebar ref="sidebar" :collapse="collapse">
+    <app-sidebar
+      ref="sidebar"
+      :collapse="collapse"
+    >
       <app-header @toggle-sidebar="collapse = !collapse" />
 
       <app-tabs>
-        <template v-if="editors.length">
-          <draggable
-              :list="editors"
-              class="list-group"
-              ghost-class="ghost"
-              handle=".drag-icon"
-              @end="dragEnd"
-          >
-            <transition-group>
-              <app-tab
-                  v-for="(editor, key) in editors"
-                  :key="editor.id"
-                  @click="setTab(key)"
-                  :editor="editor"
-                  :active="(activeEditor === key)"
+        <!--eslint-disable-->
+        <SlickList
+          v-if="editors.length"
+          v-model:list="getEditors"
+          axis="y"
+          lock-axis="y"
+          helper-class="ghost"
+          use-drag-handle
+          item-key="id"
+          @sort-end="dragEnd"
+        >
+          <!--eslint-enable-->
+          <SlickItem v-for="(editor, index) in getEditors" :key="editor.id" :index="index">
+            <app-tab
+              :editor="editor"
+              :active="(activeEditor === index)"
+              @click="setTab(index)"
+            >
+              <DragHandle>
+                <font-awesome-icon
+                  v-if="!collapse"
+                  :icon="['fas', 'sort']"
+                  class="drag-icon"
+                />
+              </DragHandle>
+              <span
+                v-tooltip="editor.name"
+                class="tab-title"
+                @dblclick="focusTitle"
               >
-                <font-awesome-icon :icon="['fas', 'sort']" class="drag-icon" v-if="!collapse" />
-                <span
-                    class="tab-title"
-                    @dblclick="focusTitle"
-                    v-b-tooltip="editor.name"
-                >
-                  {{ editor.name }}
-                </span>
-                <span
-                    v-if="!collapse"
-                    class="tab-close"
-                    @click="editorsStore.closeTab(key)"
-                >
-                  <font-awesome-icon :icon="['fas', 'xmark']" />
-                </span>
-              </app-tab>
-            </transition-group>
-          </draggable>
-        </template>
+                {{ editor.name }}
+              </span>
+              <span
+                v-if="!collapse"
+                class="tab-close"
+                @click="editorsStore.closeTab(index)"
+              >
+                <font-awesome-icon :icon="['fas', 'xmark']" />
+              </span>
+            </app-tab>
+          </SlickItem>
+        </SlickList>
         <div
-            @click.prevent="editorsStore.newTab()"
-            class="tab-item tab-plus"
+          class="tab-item tab-plus"
+          @click.prevent="editorsStore.newTab()"
         >
           <font-awesome-icon :icon="['fas', 'plus']" />
         </div>
@@ -50,18 +60,18 @@
       <app-footer-panel>
         <buttons-group>
           <app-button
-              v-b-tooltip="'Настройки'"
-              v-if="!collapse"
-              @click="$bvModal.show('settingsModal')"
-              variant="light"
+            v-if="!collapse"
+            v-tooltip="'Настройки'"
+            variant="light"
+            @click="showSettingsModal = true"
           >
             <font-awesome-icon :icon="['fas', 'gear']" />
           </app-button>
 
           <checkbox-button
-              v-model="darkMode"
-              @input="darkModeChange"
-              title="Темная тема"
+            :value="darkMode"
+            title="Темная тема"
+            @input="darkModeChange"
           >
             <font-awesome-icon :icon="['fas', 'moon']" />
           </checkbox-button>
@@ -72,70 +82,56 @@
     <template v-if="editors.length">
       <app-main>
         <title-input1
-            ref="titleInput"
-            :value="currentEditor.name"
-            placeholder="Имя заметки"
-            @input="changeEditorName"
-        ></title-input1>
+          ref="titleInput"
+          :value="currentEditor.name"
+          placeholder="Имя заметки"
+          @input="changeEditorName"
+        />
 
         <ckeditor
-            :editor="classicEditor"
-            :value="currentEditor.data"
-            :config="{}"
-            @input="changeEditorData"
-            @focus="inFocus = true"
-            @blur="inFocus = false"
-        ></ckeditor>
+          :editor="classicEditor"
+          :model-value="currentEditor.data"
+          :config="{}"
+          @update:model-value="changeEditorData"
+          @focus="inFocus = true"
+          @blur="inFocus = false"
+        />
 
         <app-timers
-            :editor="currentEditor"
-            :currentTabTimeDiff="currentTabTimeDiff"
-            :currentTabTimeWhileOpen="currentTabTimeWhileOpen"
-            :currentTabTimeWhileFocus="currentTabTimeWhileFocus"
-        ></app-timers>
+          :editor="currentEditor"
+          :current-tab-time-diff="currentTabTimeDiff"
+          :current-tab-time-while-open="currentTabTimeWhileOpen"
+          :current-tab-time-while-focus="currentTabTimeWhileFocus"
+        />
 
-        <b-modal id="settingsModal" size="xl" centered title="Настройки">
+        <app-modal
+          v-if="showSettingsModal"
+          id="settingsModal"
+          title="Настройки"
+        >
           <h4>Тема</h4>
           <hr>
 
-          <theme-list @changeTheme="setTheme" />
+          <theme-list @change-theme="setTheme" />
           <hr>
 
           <h4>Цвет</h4>
           <hr>
 
-          <color-picker v-bind="color" @input="setColor"></color-picker>
+          <color-picker
+            v-bind="color"
+            @input="setColor"
+          />
 
-          <template v-slot:modal-footer="{ ok }">
-            <app-button variant="primary" @click="ok()">
+          <template #footer>
+            <app-button
+              variant="primary"
+              @click="showSettingsModal = false"
+            >
               OK
             </app-button>
           </template>
-        </b-modal>
-
-        <b-modal
-            id="sourceViewer"
-            size="xl"
-            centered
-            title="Исходный код"
-        >
-          <codemirror
-              id="cmEditor"
-              ref="cmEditor"
-              :value="sourceCodeEditorDataBeautify"
-              :options="cmOptions"
-              @input="onCmCodeChange"
-          ></codemirror>
-
-          <template v-slot:modal-footer="{ ok }">
-            <app-button variant="primary" @click="ok()">
-              <font-awesome-icon :icon="['fas', 'save']" class="mr-2" />Сохранить
-            </app-button>
-            <app-button variant="dark" @click="copySource" ref="copyInBufferBtn">
-              <font-awesome-icon :icon="['fas', 'clipboard']" class="mr-2" />Скопировать
-            </app-button>
-          </template>
-        </b-modal>
+        </app-modal>
       </app-main>
     </template>
 
@@ -148,9 +144,9 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import moment from 'moment';
-import Beautify from 'js-beautify';
+import 'moment/locale/ru';
 import ColorPicker from '@radial-color-picker/vue-color-picker';
-import Draggable from 'vuedraggable';
+import { SlickList, SlickItem, DragHandle } from 'vue-slicksort';
 
 import ClassicEditor from './ckeditor';
 
@@ -163,13 +159,13 @@ import AppMain from './components/AppMain.vue';
 import TitleInput1 from './components/TitleInput.vue';
 import AppTimers from './components/AppTimers.vue';
 import ThemeList from './components/ThemeList.vue';
+import AppModal from '@/components/AppModal.vue';
 
 import ButtonsGroup from './components/buttons/ButtonsGroup.vue'
 import AppButton from './components/buttons/AppButton.vue'
 import CheckboxButton from '@/components/buttons/CheckboxButton.vue';
-import { useBVModal, useBVToast, useBVRoot } from '@/composables/bootstarp-vue';
 
-import { useThemeStore } from '@/store/theme';
+import { themeStorage } from '@/store/theme';
 import { useEditorsStore } from '@/store/editors';
 
 const classicEditor = ref(ClassicEditor);
@@ -177,51 +173,22 @@ const classicEditor = ref(ClassicEditor);
 // options
 const collapse = ref(false);
 
-// timers
-const interval = ref(null);
-const inFocus = ref(false);
-const currentTabTimeDiff = ref('');
-const currentTabTimeWhileOpen = ref('');
-const currentTabTimeWhileFocus = ref('');
-
 // source editor
-const sourceCodeEditorDataBeautify = ref('');
-const sourceCodeEditorData = ref('');
-const cmOptions = ref({
-  tabSize: 2,
-  mode: 'xml',
-  htmlMode: true,
-  matchClosing: true,
-  theme: 'idea',
-  lineNumbers: true,
-  line: true,
-  lineWrapping: false,
-  autofocus: true,
-  autoRefresh: true,
-});
-
-const $toast = useBVToast();
-
-const themeStore = useThemeStore();
 const editorsStore = useEditorsStore();
 
-const color = computed(() => themeStore.color);
-const coloredMode = computed(() => themeStore.coloredMode);
-const customColor = computed(() => themeStore.customColor);
-const theme = computed(() => themeStore.theme);
-const themes = computed(() => themeStore.themes);
 const editors = computed(() => editorsStore.editors);
 const activeEditor = computed(() => editorsStore.activeEditor);
-
 const currentEditor = computed(() => editors.value[activeEditor.value]);
-const darkMode = computed({
+const getEditors = computed({
   get() {
-    return themeStore.darkMode;
+    return editors.value || [];
   },
   set(value) {
-    themeStore.setDarkMode(value);
+    editorsStore.setEditors(value);
   },
 });
+
+const showSettingsModal = ref(false);
 
 onMounted(() => {
   editorsStore.loadEditors();
@@ -230,35 +197,19 @@ onMounted(() => {
     tick();
   }, 1000);
 
-  document.addEventListener('showSourceModal', () => {
-    sourceCodeEditorDataBeautify.value = Beautify.html(
-        editors.value[activeEditor.value].data
-    );
-    useBVModal().show('sourceViewer');
-    sourceCodeEditorData.value = '';
-  });
-
-  useBVRoot().$on('bv::modal::hide', (bvEvent, modalId) => {
-    if (isSourceViewerOk(bvEvent, modalId)) {
-      editorsStore.setSourceCodeEditorData(sourceCodeEditorData.value);
-    }
-  });
-
   initTheme();
 });
 
-watch(darkMode, (darkMode) => {
-  if (darkMode) document.body.classList.add('dark');
-  else document.body.classList.remove('dark');
-});
-watch(coloredMode, (colored) => {
-  if (colored) document.body.classList.add('colored');
-  else document.body.classList.remove('colored');
-});
-
 // theme
+const color = computed(() => themeStorage.value.color);
+const coloredMode = computed(() => themeStorage.value.coloredMode);
+const customColor = computed(() => themeStorage.value.customColor);
+const theme = computed(() => themeStorage.value.theme);
+const themes = computed(() => themeStorage.value.themes);
+const darkMode = computed(() => themeStorage.value.darkMode);
+
 function darkModeChange(dark) {
-  themeStore.setDarkMode(dark);
+  themeStorage.value.darkMode = dark;
   let colored = coloredMode.value;
 
   if (colored && dark) {
@@ -279,7 +230,8 @@ function darkModeChange(dark) {
   }
 }
 function setColor(hue) {
-  themeStore.setColor(hue);
+  themeStorage.value.color.hue = hue;
+  themeStorage.value.customColor = true;
   setTheme(theme.value);
 }
 function setTheme(name) {
@@ -358,62 +310,21 @@ function setTheme(name) {
     document.documentElement.style.setProperty(cssVar, value);
   }
 
-  cmOptions.value.theme = (dark) ? 'darcula' : 'idea';
-
-  themeStore.setTheme(name);
+  themeStorage.value.darkMode = dark;
+  themeStorage.value.theme = name;
 }
 function initTheme(){
-  themeStore.initTheme();
   setTheme(theme.value);
 }
 
-// source code editor
-function isSourceViewerOk(bvEvent, modalId) {
-  return modalId === 'sourceViewer'
-      && bvEvent.trigger === 'ok'
-      && sourceCodeEditorData.value;
-}
-async function copySource() {
-  if (navigator.clipboard === undefined) {
-    $toast.toast(`Невозможно скопировать в буфер обмена из отсутствия HTTPS`, {
-      title: 'Ошибка',
-      autoHideDelay: 2000,
-      appendToast: true,
-      variant: 'danger',
-      toaster: 'b-toaster-top-center'
-    });
-
-    return;
-  }
-
-  try {
-    await navigator.clipboard.writeText(
-        (sourceCodeEditorData.value)
-            ? sourceCodeEditorData.value
-            : sourceCodeEditorDataBeautify.value
-    )
-    $toast.toast(`Исходный код скопирован`, {
-      title: 'Уведомление',
-      autoHideDelay: 2000,
-      appendToast: true,
-      variant: 'success',
-      toaster: 'b-toaster-top-center'
-    })
-  } catch (err) {
-    $toast.toast(`Произошла ошибка при копировании в буфер`, {
-      title: 'Ошибка',
-      autoHideDelay: 2000,
-      appendToast: true,
-      variant: 'danger',
-      toaster: 'b-toaster-top-center'
-    });
-    console.error('Произошла ошибка при копировании в буфер', err);
-  }
-}
-
-function onCmCodeChange(data) {
-  sourceCodeEditorData.value = data;
-}
+watch(darkMode, (darkMode) => {
+  if (darkMode) document.body.classList.add('dark');
+  else document.body.classList.remove('dark');
+}, { immediate: true });
+watch(coloredMode, (colored) => {
+  if (colored) document.body.classList.add('colored');
+  else document.body.classList.remove('colored');
+}, { immediate: true });
 
 // Editor change handlers
 function changeData() {
@@ -451,6 +362,12 @@ function focusTitle() {
 }
 
 // timers
+const interval = ref(null);
+const inFocus = ref(false);
+const currentTabTimeDiff = ref('');
+const currentTabTimeWhileOpen = ref('');
+const currentTabTimeWhileFocus = ref('');
+
 function tick() {
   if (!editors.value.length) return;
 
@@ -467,24 +384,22 @@ function tick() {
 }
 function setCurrentTabTimeFromCreate() {
   const diffTime = moment().diff(currentEditor.value.time.create);
-  const duration = moment.duration(diffTime);
-  currentTabTimeDiff.value = `${getFormattedTimes(duration)} назад`;
+  currentTabTimeDiff.value = `${getFormattedTimes(moment.duration(diffTime))} назад`;
 }
 function setCurrentTabTimeWhileOpen() {
-  const duration = moment.duration(currentEditor.value.time.open);
-  currentTabTimeWhileOpen.value = getFormattedTimes(duration);
+  currentTabTimeWhileOpen.value = getFormattedTimes(
+      moment.duration(currentEditor.value.time.open),
+  );
 }
 function setCurrentTabTimeWhileFocus() {
-  const duration = moment.duration(currentEditor.value.time.focus);
-  currentTabTimeWhileFocus.value = getFormattedTimes(duration);
+  currentTabTimeWhileFocus.value = getFormattedTimes(
+      moment.duration(currentEditor.value.time.focus),
+  );
 }
 function getFormattedTimes(duration) {
-  let hours = '0' + duration.hours();
-  let minutes = '0' + duration.minutes();
-  let seconds = '0' + duration.seconds();
-  hours = hours.slice(-2);
-  minutes = minutes.slice(-2);
-  seconds = seconds.slice(-2);
+  const hours = `0${duration.hours()}`.slice(-2);
+  const minutes = `0${duration.minutes()}`.slice(-2);
+  const seconds = `0${duration.seconds()}`.slice(-2);
 
   return `${hours}:${minutes}:${seconds}`;
 }

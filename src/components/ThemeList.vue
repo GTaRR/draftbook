@@ -2,7 +2,7 @@
   <div class="theme-list">
     <div
       class="theme-item default"
-      @click="$emit('changeTheme','default')"
+      @click="$emit('change-theme','default')"
       :class="{ active: theme === 'default' }"
     >
       <div class="theme-item__title">Светлая</div>
@@ -17,7 +17,7 @@
 
     <div
       class="theme-item colored"
-      @click="$emit('changeTheme','colored')"
+      @click="$emit('change-theme','colored')"
       :class="{ active: theme === 'colored' }"
     >
       <div class="theme-item__title">Цветная</div>
@@ -32,7 +32,7 @@
 
     <div
       class="theme-item dark"
-      @click="$emit('changeTheme','dark')"
+      @click="$emit('change-theme','dark')"
       :class="{ active: theme === 'dark' }"
     >
       <div class="theme-item__title">Тёмная</div>
@@ -47,7 +47,7 @@
 
     <div
       class="theme-item colored dark"
-      @click="$emit('changeTheme','colored-dark')"
+      @click="$emit('change-theme','colored-dark')"
       :class="{ active: theme === 'colored-dark' }"
     >
       <div class="theme-item__title">Тёмная + Цветная</div>
@@ -63,12 +63,12 @@
 </template>
 
 <script setup>
-import { useThemeStore } from '@/store/theme';
-import { computed } from 'vue';
+import { themeStorage } from '@/store/theme';
+import { computed, defineEmits } from 'vue';
 
-const themeStore = useThemeStore();
+defineEmits(['change-theme']);
 
-const theme = computed(() => themeStore.theme);
+const theme = computed(() => themeStorage.value.theme);
 </script>
 
 <style lang="scss">

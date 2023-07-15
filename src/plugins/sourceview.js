@@ -9,7 +9,7 @@ class SourceView extends Plugin {
 
         editor.ui.componentFactory.add( 'sourceView', locale => {
            const view = new ButtonView( locale );
-           const event = new CustomEvent( "showSourceModal" );
+           const event = new CustomEvent( "show-source-modal" );
 
            view.set( {
                label: 'Просмотреть исходный код',

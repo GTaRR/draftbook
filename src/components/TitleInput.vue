@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import { defineProps, ref } from 'vue';
+import { defineProps, ref, defineExpose } from 'vue';
 
 defineProps({
   value: String,
@@ -23,6 +23,9 @@ const input = ref(null);
 function focus() {
   input.value.focus();
 }
+defineExpose({
+  focus,
+});
 </script>
 
 <style lang="scss">

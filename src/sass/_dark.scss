@@ -5,14 +5,13 @@
   .ck-content blockquote {
     border-left-color: #383838;
   }
-  .modal-content {
+  .modal-container {
     background-color: rgb(24, 26, 27);
     border-color: rgba(140, 130, 115, 0.2);
+    color: rgb(209, 205, 199);
+
     .close {
       filter: invert(1);
-    }
-    h4 {
-      color: rgb(209, 205, 199);
     }
   }
   .modal-header {
@@ -20,9 +19,6 @@
   }
   .modal-footer {
     border-top-color: rgb(53, 57, 60);
-  }
-  .modal-title {
-    color: rgb(209, 205, 199);
   }
   code {
     color: var(--primary);

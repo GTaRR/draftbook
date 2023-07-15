@@ -30,7 +30,10 @@ import RemoveFormat from '@ckeditor/ckeditor5-remove-format/src/removeformat';
 import AutoFormat from '@ckeditor/ckeditor5-autoformat/src/autoformat';
 // import ClipBoard from '@ckeditor/ckeditor5-clipboard/src/clipboard';
 
-import SourceView from './plugins/sourceview';
+import { SourceEditing }  from '@ckeditor/ckeditor5-source-editing';
+import { GeneralHtmlSupport } from '@ckeditor/ckeditor5-html-support';
+
+// import SourceView from './plugins/sourceview';
 
 import '@ckeditor/ckeditor5-build-classic/build/translations/ru';
 
@@ -69,7 +72,9 @@ ClassicEditor.builtinPlugins = [
     AutoFormat,
     PasteFromOffice,
 
-    SourceView
+    GeneralHtmlSupport,
+    SourceEditing,
+    // SourceView,
 ];
 
 ClassicEditor.defaultConfig = {
@@ -91,8 +96,9 @@ ClassicEditor.defaultConfig = {
             '|',
             'undo', 'redo',
             '|',
-            'sourceView'
-        ]
+            'sourceEditing',
+            // 'sourceView'
+        ],
     },
     table: {
         contentToolbar: [ 'tableColumn', 'tableRow', 'mergeTableCells' ]
