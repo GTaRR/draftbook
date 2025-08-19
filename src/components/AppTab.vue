@@ -10,6 +10,7 @@ import { defineProps } from 'vue';
 defineProps({
   active: Boolean,
 });
+defineEmits(['click'])
 </script>
 
 <style lang="scss">

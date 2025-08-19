@@ -34,6 +34,8 @@ import { defineProps } from 'vue';
 defineProps({
   title: String,
 });
+
+defineEmits(['close'])
 </script>
 
 <style lang="scss">

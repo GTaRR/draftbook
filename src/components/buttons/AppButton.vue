@@ -15,6 +15,7 @@ import { defineProps, computed } from 'vue';
 const props = defineProps({
   variant: String,
 });
+defineEmits(['click'])
 
 const btnClass = computed(() => {
   return (props.variant) ? 'btn-' + props.variant : '';

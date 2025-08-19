@@ -81,7 +81,7 @@
 
     <template v-if="editors.length">
       <app-main>
-        <title-input1
+        <TitleInput
           ref="titleInput"
           :value="currentEditor.name"
           placeholder="Имя заметки"
@@ -156,7 +156,7 @@ import AppTabs from './components/AppTabs.vue';
 import AppTab from './components/AppTab.vue';
 import AppFooterPanel from './components/FooterPanel.vue';
 import AppMain from './components/AppMain.vue';
-import TitleInput1 from './components/TitleInput.vue';
+import TitleInput from './components/TitleInput.vue';
 import AppTimers from './components/AppTimers.vue';
 import ThemeList from './components/ThemeList.vue';
 import AppModal from '@/components/AppModal.vue';
@@ -336,6 +336,7 @@ function changeEditorData(value) {
   editorsStore.setEditorProperty({ property: 'data', value });
 }
 function changeEditorName(value) {
+  console.log(value);
   editorsStore.setEditorProperty({ property: 'name', value });
 }
 

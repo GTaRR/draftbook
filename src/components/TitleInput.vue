@@ -17,6 +17,8 @@ defineProps({
   placeholder: String,
 });
 
+defineEmits(['input']);
+
 const input = ref(null);
 
 // eslint-disable-next-line no-unused-vars
